@@ -84,11 +84,11 @@ export function Footer({ t }: { t: Theme }) {
             </span>
           </div>
           <div style={{ ...mono, color: t.muted, marginBottom: 12 }}>
-            Autonomous X posting — human approved
+            Consistency on X, in your voice, on your call
           </div>
-          <div style={{ fontFamily: t.uiFont, fontSize: 13.5, lineHeight: 1.6, color: t.muted, maxWidth: 340 }}>
-            Research, draft, and schedule for X in your voice. You approve
-            everything.
+          <div style={{ fontFamily: t.uiFont, fontSize: 13.5, lineHeight: 1.6, color: t.muted, maxWidth: 360 }}>
+            Catalyst drafts and schedules your X posts in your voice. You approve
+            every one. Nothing posts without your click.
           </div>
         </div>
 

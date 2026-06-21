@@ -76,7 +76,7 @@ export function Cta({
         }}
       >
         <div style={{ ...mono, color: t.muted, marginBottom: 18 }}>
-          Private waitlist · Early access
+          Early access
         </div>
         <h2
           style={{
@@ -90,9 +90,9 @@ export function Cta({
             textWrap: "balance",
           }}
         >
-          Ten minutes a day.
+          Stay consistent on X
           <br />
-          <span className="iris-text">Your voice</span> on X.
+          <span className="iris-text">without it becoming a second job.</span>
         </h2>
         <p
           style={{
@@ -104,8 +104,8 @@ export function Cta({
             maxWidth: 460,
           }}
         >
-          Join the waitlist for early access. We&apos;ll only email you about
-          Catalyst.
+          Join the waitlist for early access. Ten minutes a day, your voice,
+          your call on every post.
         </p>
         <div style={{ maxWidth: 420, margin: "0 auto", textAlign: "left" }}>
           {!signup ? (
@@ -115,7 +115,8 @@ export function Cta({
           )}
         </div>
         <div style={{ ...mono, fontSize: 10.5, color: t.faint, marginTop: 18 }}>
-          No spam · No auto-posting · Unsubscribe anytime
+          We&apos;ll only email you about Catalyst. No spam, no list-selling,
+          unsubscribe anytime.
         </div>
       </div>
     </section>

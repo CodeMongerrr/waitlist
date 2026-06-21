@@ -124,7 +124,7 @@ export function SignupForm({ t, onSuccess, dense = false }: Props) {
         type="email"
         inputMode="email"
         autoComplete="email"
-        placeholder="you@company.com"
+        placeholder="you@email.com"
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);

@@ -69,6 +69,10 @@ button {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(6px); }
 }
+@keyframes spineFlow {
+  from { top: -32%; }
+  to { top: 120%; }
+}
 
 /* ---------- film grain (one shared overlay) ---------- */
 .grain {
@@ -151,6 +155,37 @@ button {
 @media (max-width: 760px) {
   .hide-sm {
     display: none !important;
+  }
+}
+
+/* audit-rail (how it works): grid via class so media queries can collapse it */
+.audit-row {
+  display: grid;
+  grid-template-columns: clamp(72px, 9vw, 116px) 28px 1fr;
+  column-gap: clamp(16px, 3vw, 36px);
+  align-items: start;
+  position: relative;
+}
+@media (max-width: 760px) {
+  .audit-row {
+    grid-template-columns: 22px 1fr;
+  }
+  .rail-gutter {
+    display: none !important;
+  }
+}
+
+/* trust manifesto: clause grid that collapses to one column */
+.clause {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) 1fr;
+  column-gap: clamp(24px, 4vw, 56px);
+  align-items: baseline;
+}
+@media (max-width: 720px) {
+  .clause {
+    grid-template-columns: 1fr;
+    row-gap: 12px;
   }
 }
 

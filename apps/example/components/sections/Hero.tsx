@@ -6,9 +6,9 @@ import { SignupForm } from "../SignupForm";
 import { ReferralCard } from "../ReferralCard";
 
 const CHIPS: { label: string; dot: keyof Pick<Theme, "accentCyan" | "accentMint" | "accent"> }[] = [
-  { label: "Consistent, not consuming", dot: "accentCyan" },
-  { label: "Sounds like you", dot: "accent" },
-  { label: "Nothing posts without approval", dot: "accentMint" },
+  { label: "~10 min/day to approve", dot: "accentCyan" },
+  { label: "Sounds like you, not a bot", dot: "accent" },
+  { label: "Nothing posts without your click", dot: "accentMint" },
 ];
 
 export function Hero({
@@ -105,7 +105,7 @@ export function Hero({
                   animation: "dotPulse 2s infinite",
                 }}
               />
-              Catalyst / X growth system
+              Catalyst — for X
             </div>
 
             <h1
@@ -120,21 +120,9 @@ export function Hero({
                 textWrap: "balance",
               }}
             >
-              Show up on X <span className="iris-text">every day</span>,
+              You know X matters.
               <br />
-              written{" "}
-              <span
-                style={{
-                  fontFamily: t.serifFont,
-                  fontStyle: "italic",
-                  fontWeight: 400,
-                  color: "#C0A6FF",
-                }}
-              >
-                in your voice
-              </span>
-              ,<br />
-              posted on your call.
+              <span className="iris-text">You keep falling off anyway.</span>
             </h1>
 
             <p
@@ -148,8 +136,12 @@ export function Hero({
               }}
             >
               Catalyst is an autonomous multi-agent system that researches,
-              drafts, and schedules your X posts. You spend about ten minutes a
-              day approving drafts. Nothing is ever posted without your click.
+              drafts, and schedules your X posts{" "}
+              <span style={{ fontFamily: t.serifFont, fontStyle: "italic", color: "#C0A6FF" }}>
+                in your voice
+              </span>
+              . You spend about ten minutes a day approving drafts. Nothing
+              posts without your click — ever.
             </p>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>

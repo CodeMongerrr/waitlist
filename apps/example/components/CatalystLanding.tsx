@@ -42,13 +42,14 @@ export function CatalystLanding() {
 
 function Marquee({ t }: { t: typeof THEME }) {
   const items = [
-    "X only",
-    "Nothing posts without your click",
+    "Ten minutes a day",
     "Sounds like you, not a bot",
-    "~10 min a day",
-    "For founders · DevRel · indie hackers",
-    "No virality promises",
-    "You stay in control",
+    "Nothing posts without your click",
+    "No auto-post, ever",
+    "X only, done seriously",
+    "Researched, not hallucinated",
+    "A loop you can audit",
+    "Your voice, amplified",
   ];
   const Strip = () => (
     <span style={{ display: "inline-flex", alignItems: "center" }}>

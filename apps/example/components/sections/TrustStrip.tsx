@@ -1,33 +1,69 @@
 import type { Theme } from "@/lib/theme";
 import { SectionMark } from "./SectionMark";
 
+const HAIRLINE =
+  "linear-gradient(90deg, rgba(124,92,255,0) 0%, rgba(124,92,255,0.42) 16%, rgba(35,213,224,0.42) 50%, rgba(255,158,122,0.42) 84%, rgba(255,158,122,0) 100%)";
+
 export function TrustStrip({ t }: { t: Theme }) {
-  const cards = [
-    {
-      eyebrow: "In control",
-      dot: t.accentMint,
-      title: "You are the only thing that publishes",
-      body: "Catalyst drafts and queues. You click. No auto-post, no set-and-forget, no “approved by default after N hours.”",
-    },
-    {
-      eyebrow: "In your voice",
-      dot: t.accent,
-      title: "Trained on you, not a template",
-      body: "It learns from your existing posts, so drafts read like your account on a good day. Not a generic high-engagement bot voice.",
-    },
-    {
-      eyebrow: "Scoped on purpose",
-      dot: t.accentCyan,
-      title: "X only. One job, done well",
-      body: "No cross-posting sprawl, no follower promises. Just consistency in your voice, without the daily time sink.",
-    },
-  ];
   const mono: React.CSSProperties = {
     fontFamily: t.monoFont,
     fontSize: 11,
     letterSpacing: "0.16em",
     textTransform: "uppercase",
   };
+
+  const clauses = [
+    {
+      no: "§01",
+      marker: "In control",
+      dot: t.accentMint,
+      statement: (
+        <>
+          Nothing posts{" "}
+          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.accentMint }}>
+            without you
+          </span>
+        </>
+      ),
+      sub: "No auto-post mode. No silent timer. If you don't click, nothing ships. If you go quiet, your account goes quiet.",
+      bright: true,
+    },
+    {
+      no: "§02",
+      marker: "In your voice",
+      dot: t.accent,
+      statement: (
+        <>
+          It amplifies you,{" "}
+          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: "#C0A6FF" }}>
+            never replaces you
+          </span>
+        </>
+      ),
+      sub: "The point is to sound like you on a day you can't write — not like an AI tweet generator chasing numbers. If a draft doesn't sound like you, reject it, and it learns.",
+    },
+    {
+      no: "§03",
+      marker: "Scoped on purpose",
+      dot: t.accentCyan,
+      statement: (
+        <>
+          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.accentCyan }}>
+            X only
+          </span>
+          , on purpose
+        </>
+      ),
+      sub: "One platform, done seriously. No LinkedIn cross-posting, no follower promises, no virality theater. Just consistent posts you'd put your name on.",
+    },
+  ];
+
+  const sigTokens = [
+    { t: "No auto-posting", c: t.accentMint },
+    { t: "No follower guarantees", c: t.accent },
+    { t: "X only", c: t.accentCyan },
+    { t: "Human-approved", c: t.accentPeach },
+  ];
 
   return (
     <section
@@ -42,10 +78,10 @@ export function TrustStrip({ t }: { t: Theme }) {
         style={{
           fontFamily: t.displayFont,
           fontWeight: 700,
-          fontSize: "clamp(30px,5vw,56px)",
-          lineHeight: 1.02,
+          fontSize: "clamp(28px,5vw,52px)",
+          lineHeight: 1.04,
           letterSpacing: "-0.025em",
-          margin: "0 0 40px",
+          margin: "0 0 clamp(20px,3vw,40px)",
           color: t.fg,
           textWrap: "balance",
           maxWidth: 760,
@@ -54,84 +90,131 @@ export function TrustStrip({ t }: { t: Theme }) {
         Built for people who guard their account.
       </h2>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-        {cards.map((c, i) => (
+      <div>
+        {clauses.map((c, i) => (
           <div
-            key={c.eyebrow}
-            className="glass reveal"
+            key={c.no}
+            className="reveal"
             data-reveal
-            style={{
-              flex: "1 1 260px",
-              minWidth: 0,
-              borderRadius: 16,
-              padding: 24,
-              animationDelay: `${i * 80}ms`,
-            }}
+            style={{ position: "relative", animationDelay: `${i * 80}ms` }}
           >
-            <div style={{ ...mono, display: "flex", alignItems: "center", gap: 8, color: t.muted, marginBottom: 16 }}>
-              <span
+            {c.bright && (
+              <div
+                aria-hidden
                 style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: 99,
-                  background: c.dot,
-                  boxShadow: `0 0 10px ${c.dot}`,
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 0,
+                  pointerEvents: "none",
+                  background:
+                    "radial-gradient(60% 100% at 14% 0%, rgba(91,233,185,0.12), transparent 60%)",
                 }}
               />
-              {c.eyebrow}
-            </div>
+            )}
             <div
               style={{
-                fontFamily: t.displayFont,
-                fontSize: 20,
-                fontWeight: 600,
-                color: t.fg,
-                letterSpacing: "-0.01em",
-                lineHeight: 1.15,
-                marginBottom: 10,
+                height: 1,
+                background: c.bright ? "rgba(91,233,185,0.5)" : HAIRLINE,
               }}
-            >
-              {c.title}
-            </div>
-            <div style={{ fontFamily: t.uiFont, fontSize: 13.5, lineHeight: 1.6, color: t.muted }}>
-              {c.body}
+            />
+            <div className="clause" style={{ position: "relative", zIndex: 1, padding: "clamp(28px,4.5vw,48px) 0" }}>
+              <div style={{ ...mono, color: t.muted, display: "flex", alignItems: "center", gap: 9 }}>
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 99,
+                    background: c.dot,
+                    boxShadow: `0 0 10px ${c.dot}`,
+                    flex: "none",
+                  }}
+                />
+                {c.no} — {c.marker}
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontFamily: t.displayFont,
+                    fontWeight: 600,
+                    fontSize: "clamp(23px,3.4vw,38px)",
+                    lineHeight: 1.12,
+                    letterSpacing: "-0.02em",
+                    color: t.fg,
+                    textWrap: "balance",
+                  }}
+                >
+                  {c.statement}
+                </div>
+                <div
+                  style={{
+                    fontFamily: t.uiFont,
+                    fontSize: 14,
+                    lineHeight: 1.6,
+                    color: t.muted,
+                    marginTop: 12,
+                    maxWidth: "56ch",
+                  }}
+                >
+                  {c.sub}
+                </div>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Reassurance bar: honest anti-claims build trust with skeptics. */}
+      {/* Signature line: honest anti-claims closed like an invoice total. */}
       <div
         style={{
-          marginTop: 16,
-          borderRadius: 14,
-          border: `1px solid ${t.border}`,
-          background: "rgba(255,255,255,0.02)",
+          marginTop: 8,
+          paddingTop: 18,
           borderTop: `1px solid ${t.borderStrong}`,
-          padding: "16px 20px",
-          textAlign: "center",
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 14,
           ...mono,
           fontSize: 11,
           color: t.muted,
         }}
       >
-        No auto-posting · No follower guarantees · X only · Human-approved
+        <span style={{ color: t.faint }}>◆ Spec</span>
+        {sigTokens.map((s) => (
+          <span key={s.t} style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: 99,
+                background: s.c,
+                boxShadow: `0 0 9px ${s.c}`,
+              }}
+            />
+            {s.t}
+          </span>
+        ))}
       </div>
 
       <div
         style={{
           textAlign: "center",
-          marginTop: 28,
+          marginTop: 26,
           fontFamily: t.uiFont,
           fontSize: "clamp(14px,1.4vw,16px)",
           color: t.muted,
+          maxWidth: 680,
+          marginLeft: "auto",
+          marginRight: "auto",
+          lineHeight: 1.6,
         }}
       >
-        Built for solo founders, DevRel, and technical creators in crypto, AI,
-        and devtools.
+        Built for solo founders, DevRel engineers, and technical creators in
+        crypto, AI, and devtools — people for whom X is pipeline, hiring, and
+        reputation, not a hobby.
       </div>
-      <div style={{ textAlign: "center", marginTop: 8, ...mono, fontSize: 10.5, color: t.faint }}>
-        Currently a private waitlist · No pricing yet · You&apos;re early
+      <div style={{ textAlign: "center", marginTop: 10, ...mono, fontSize: 10.5, color: t.faint }}>
+        We never post without an explicit approval click · Not affiliated with X
       </div>
     </section>
   );
