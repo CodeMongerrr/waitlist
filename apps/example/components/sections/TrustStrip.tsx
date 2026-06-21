@@ -59,10 +59,7 @@ export function TrustStrip({ t }: { t: Theme }) {
   ];
 
   const sigTokens = [
-    { t: "No auto-posting", c: t.accentMint },
-    { t: "No follower guarantees", c: t.accent },
     { t: "Built for X", c: t.accentCyan },
-    { t: "Human-approved", c: t.accentPeach },
   ];
 
   return (
