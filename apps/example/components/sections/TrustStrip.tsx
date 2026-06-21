@@ -34,7 +34,7 @@ export function TrustStrip({ t }: { t: Theme }) {
       dot: t.accent,
       statement: (
         <>
-          It amplifies you,{" "}
+          Amplifies you,{" "}
           <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.fg }}>
             never replaces you
           </span>

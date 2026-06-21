@@ -3,6 +3,7 @@
 import type { Theme } from "@/lib/theme";
 import type { Signup } from "@/lib/helpers";
 import { FloatingSignup } from "../FloatingSignup";
+import { LiveCount } from "../LiveCount";
 
 export function Cta({
   t,
@@ -81,10 +82,14 @@ export function Cta({
             maxWidth: 520,
           }}
         >
-          Let Catalyst do the reading and the first draft. You keep your voice,
-          your judgment, and ten minutes a day. Every post waits for your
+          Let Catalyst do the reading and the first draft, sourced from
+          what&apos;s actually happening in your niche. You keep your voice, your
+          judgment, and about ten minutes a day. Every post waits for your
           approval.
         </p>
+        <div style={{ marginBottom: 20 }}>
+          <LiveCount t={t} />
+        </div>
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
           <FloatingSignup t={t} signup={signup} setSignup={setSignup} />
         </div>

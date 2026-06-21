@@ -10,7 +10,7 @@ The single-scroll waitlist landing for **Catalyst**, an autonomous-but-approved 
 
 ## 1. Positioning & content strategy
 
-**Product in one line:** Catalyst reads your niche, drafts posts in your voice, and queues them. You spend about ten minutes a day approving the good ones. Every post waits for your approval.
+**Product in one line:** Catalyst reads Reddit, Hacker News, and Google News in your niche, drafts posts in your voice from what's actually happening, and queues them. You spend about ten minutes a day approving the good ones. Every post waits for your approval.
 
 **Audience:** Solo founders, DevRel engineers, and technical creators in crypto, AI, and devtools. People for whom X is pipeline, hiring, and reputation, not a hobby.
 
@@ -23,6 +23,8 @@ The single-scroll waitlist landing for **Catalyst**, an autonomous-but-approved 
 3. **Control is the differentiator.** Competitors lean on monetization and automation. Catalyst leans on restraint: human-approved, single platform, no virality theater. Keep that spine; do not bolt on revenue/payout claims.
 4. **Co-writer, not ghostwriter.** "It amplifies you, never replaces you." The draft is a starting point; the human decision is always real.
 5. **Low friction.** "No card. No spam. Just early access." Email is the only required field.
+6. **Desire first, control as the closer.** Lead with the dream (it reads your world and writes in your exact voice), then use the control story as the trust builder near the decision, not the opener. The hero and how-it-works create wanting; Control and FAQ close it.
+7. **Show momentum before signup.** A live signup counter and the referral mechanic ("+5 spots per friend") appear before signup, not only in the post-signup card. When the real count is small the counter shows a qualitative line instead of a weak number; it never fabricates.
 
 ### Banned words and punctuation (house style)
 
@@ -147,12 +149,15 @@ Render order, top to bottom:
 
 1. `.grain` overlay (fixed, full-page)
 2. **Header** (sticky)
-3. **Hero** (`#top`)
+3. **Hero** (`#top`), with the live `LiveCount`
 4. **HowItWorks** (`#how`)
 5. **TrustStrip / Control** (`#control`)
 6. **Marquee** (scrolling ticker)
-7. **Cta** (`#join`)
-8. **Footer**
+7. **Faq** (`#faq`)
+8. **Cta** (`#join`), with the live `LiveCount`
+9. **Footer**
+
+The new live counter is served by `GET /api/waitlist/count` (`{ count }`, 10s edge cache, reuses `WaitlistDb.totalSignups()`).
 
 ---
 
@@ -171,18 +176,23 @@ Sticky, `top: 0`, z-index 100, translucent `rgba(10,10,10,0.6)` + 10px backdrop 
 
 Full-viewport, centered column, text-centered. Blueprint grid behind. Content `max-width: 1180px`. Elements stagger in from the bottom on load (delays in parentheses).
 
-1. **Status badge** (60ms): pill, `border` outline, mono 11.5px, `muted`. Green pulsing dot + text **"Now in private beta · v0.4"**. Margin-bottom `clamp(28px,4vw,44px)`.
-2. **H1** (160ms): **"Grow on X `without` the full-time job."** Inter 800, `clamp(48px,11vw,132px)`, line 0.94, tracking -0.045em, `max-width: 1000px`, balanced wrap. The word **"without"** uses `.iris-text` (gray recede).
-3. **Subhead** (280ms): Inter, `clamp(16px,1.7vw,20px)`, line 1.6, `muted`, `max-width: 660px`. Text:
-   > "Catalyst reads your niche, drafts posts `in your voice`, and lines them up for you. Spend ten minutes a day approving the good ones. Every post waits for your call."
-   ("in your voice" is italic, `fg`.)
-4. **Signup box** (400ms): `FloatingSignup`, `max-width: 560px`, margin-top `clamp(32px,4vw,52px)`. See 5.8.
+1. **Status badge** (60ms): pill, `border` outline, mono 11.5px, `muted`. Green pulsing dot + text **"Now in private beta · v0.4"**. Margin-bottom 12px (tightened so the counter groups under it).
+2. **Live counter** (110ms): `LiveCount` (see 5.14), green pulsing dot + count or qualitative line. Margin-bottom `clamp(28px,4vw,44px)`.
+3. **H1** (160ms): Inter 800, `clamp(48px,11vw,132px)`, line 0.94, tracking -0.045em, `max-width: 1000px`, balanced wrap. Two A/B copies (switched by `?hero=`, default qualified):
+   - Qualified: **"Post `daily` on X, in a voice that's unmistakably yours."** (`.iris-text` on **daily**)
+   - Volume: **"Never `run out` of things to post on X."** (`.iris-text` on **run out**)
+4. **Subhead** (280ms): Inter, `clamp(16px,1.7vw,20px)`, line 1.6, `muted`, `max-width: 660px`. "in your voice" is italic, `fg`.
+   - Qualified: "Catalyst reads Reddit, Hacker News, and Google News in your niche, drafts posts `in your voice` from what's actually happening, and queues them up. You spend about ten minutes a day approving the good ones. Every post still waits for your call."
+   - Volume: "Catalyst turns what's happening in your niche into posts `in your voice`, ready to ship. You just pick the good ones."
+5. **Signup box** (400ms): `FloatingSignup`, `max-width: 560px`, margin-top `clamp(32px,4vw,52px)`. See 5.9.
+
+The A/B variant is read client-side from `?hero=volume` / `?hero=qualified` after mount (default qualified, so SSR and first paint match). It is a clearly commented block in `Hero.tsx`; delete it and keep one headline/subhead to retire the test.
 
 ### 5.3 How it works (`components/sections/HowItWorks.tsx`, `#how`)
 
 Standard section. Client component (for the interactive card).
 
-- **SectionMark:** `[ 01 ]` / "How it works" / "Loop" over a masked hairline carrying the centered file tag **"· catalyst.loop ·"** (mono, `faint`). See 5.9.
+- **SectionMark:** `[ 01 ]` / "How it works" / "Loop" over a masked hairline carrying the centered file tag **"· catalyst.loop ·"** (mono, `faint`). See 5.10.
 - **H2:** **"A loop you can audit, end to end."** Display 700, `clamp(28px,5vw,52px)`, `max-width: 760px`.
 - **Audit rail:** four rows on a 3-column grid (big numeral / glowing spine with traveling light / content). Each row reveals on load with a 70ms stagger.
 
@@ -190,14 +200,15 @@ The four stages (mono eyebrow `NN / Tag · annotation`, then display title, then
 
 | # | Eyebrow | Title | Body |
 |---|---|---|---|
-| 01 | `01 / Harvest · scans your niche` | "It reads what you'd read" | "Catalyst tracks the releases, threads, and arguments in your corner of crypto, AI, and devtools, the same sources you'd open if you had the time. Every draft starts from something real and current." |
+| 01 | `01 / Harvest · scans your niche` | "It reads what you'd read" | "Catalyst tracks the releases, threads, and arguments in your corner of crypto, AI, and devtools across Reddit, Hacker News, Google News, and X, the same sources you'd open if you had the time. Every draft starts from something real and current." |
 | 02 | `02 / Draft · from your past posts` | "It writes `in your voice`" | "Catalyst drafts from how you actually write: your phrasing, your takes, your restraint. It amplifies your voice. It does not swap it for a generic high-engagement one. This is not an AI tweet generator." |
-| 03 (bright) | `03 / Approve` | "You approve, or you don't" | "Open the dashboard, read the queue, ship what's good, kill what isn't. Roughly ten minutes. The decision is always a human one." |
+| 03 (bright) | `03 / Approve` | "You approve, or you don't" | "Open the dashboard, read the queue, ship what's good, kill what isn't. The decision is always a human one." |
 | 04 | `04 / Learn · ships on schedule` | "It posts on your call, then sharpens" | "Approved drafts post on schedule. Your edits are the training: what you approve, change, and reject tightens your voice, so the queue needs less from you each week, not more." |
 
-**Step 03 is the emphasis step** ("bright"): white outlined numeral, larger pulsing white node, title with a left white border. Below it:
+**Step 03 is the emphasis step** ("bright"): white outlined numeral, larger pulsing white node, title with a left white border. Below it, a `max-width: 340px` column:
 - Mono line (white/`accentMint`, 10.5px): **"You approve every post · ~10 min/day"**
-- The **interactive draft card** (see 5.10), `max-width: 340px`.
+- A **static example draft** (`StaticDraft`, defined in `HowItWorks.tsx`) with a faint mono caption **"A real draft Catalyst wrote for a devtools founder this week"**, so visitors who never click still see a draft. Same card chrome as the interactive one, no buttons.
+- The **interactive draft card** (see 5.11), the "try it yourself" follow-on.
 
 > The boxy radial-gradient halo that used to sit behind step 03 has been removed; emphasis now comes from the node, numeral, and border only.
 
@@ -227,19 +238,32 @@ Standard section.
 
 Full-width ticker between Control and CTA. Top+bottom hairline borders, faint background, edge-masked, 36s infinite scroll (pauses on hover). Items are mono 12px, 0.16em, `muted`, separated by a white `◆` diamond. Two copies of the strip for a seamless loop.
 
-Items: **Ten minutes a day · Sounds like you, not a bot · You approve every post · No auto-post, ever · Built for X, done right · Researched, not hallucinated · A loop you can audit · Your voice, amplified**
+Items: **Sounds like you, not a bot · You approve every post · No auto-post, ever · Built for X, done right · Researched from Reddit, HN, and Google News · A loop you can audit · Your voice, amplified**
 
-### 5.6 CTA (`components/sections/Cta.tsx`, `#join`)
+### 5.6 FAQ (`components/sections/Faq.tsx`, `#faq`)
+
+New section, placed between the Marquee and the CTA so objections are handled right before the signup ask. Standard section frame.
+
+- **SectionMark:** `[ 03 ]` / "Common questions" / "FAQ" / file tag **"· catalyst.faq ·"**. (How is `[01]`, Control is `[02]`; nothing after Control was numbered, so no other marks needed renumbering.)
+- **H2:** **"What people ask before they join."** Display 700, `clamp(28px,5vw,52px)`, `max-width: 760px`.
+- **Four Q&As**, each with a top hairline, a faint mono index (`01`-`04`), the question (Inter 600, `clamp(19px,2.4vw,24px)`), and the answer (14px `muted`, `max-width: 64ch`). Reveal-staggered 70ms.
+  1. "Will this get my account flagged?" / "No. Catalyst never posts on its own. Every post goes out only after you click approve, from your normal posting behavior, on your schedule."
+  2. "Will my posts sound like AI?" / "That is the one thing we optimize against. Catalyst drafts from how you already write: your phrasing, your takes, your restraint. If a draft does not sound like you, reject it, and it learns."
+  3. "Do I have to post every day?" / "No. You approve what is good and skip the rest. Some days that is three posts, some days it is none. The queue waits for you."
+  4. "What if I do not have time to review?" / "Drafts sit in your queue until you get to them. Nothing expires into an auto-post. The loop only moves when you say go."
+
+### 5.7 CTA (`components/sections/Cta.tsx`, `#join`)
 
 Centered, `max-width: 720px`, top hairline, faint radial depth glow behind.
 
 - **Eyebrow** (mono, 11px, 0.18em, `faint`): **"Early access"**.
 - **H2:** **"Stay consistent on X `without it becoming a second job.`"** Display 800, `clamp(34px,6vw,72px)`, line 0.98, tracking -0.04em. The second clause uses `.iris-text`.
 - **Body** (Inter, `clamp(15px,1.6vw,18px)`, `muted`, `max-width: 520px`):
-  > "Let Catalyst do the reading and the first draft. You keep your voice, your judgment, and ten minutes a day. Every post waits for your approval."
-- **Signup box** (`FloatingSignup`, `max-width: 560px`).
+  > "Let Catalyst do the reading and the first draft, sourced from what's actually happening in your niche. You keep your voice, your judgment, and about ten minutes a day. Every post waits for your approval."
+- **Live counter:** `LiveCount` (see 5.14), centered, above the form.
+- **Signup box** (`FloatingSignup`, `max-width: 560px`); its form carries the referral line (see 5.12).
 
-### 5.7 Footer (`components/sections/Footer.tsx`)
+### 5.8 Footer (`components/sections/Footer.tsx`)
 
 `bgAlt` background, top hairline, a giant ghosted **"Catalyst"** watermark (24vw, opacity ~0.045) bleeding off the bottom.
 
@@ -252,7 +276,7 @@ Centered, `max-width: 720px`, top hairline, faint radial depth glow behind.
   - A pill with green pulsing dot: **"Private waitlist open"**
   - **"Built for people who'd rather build than post"**
 
-### 5.8 FloatingSignup (`components/FloatingSignup.tsx`)
+### 5.9 FloatingSignup (`components/FloatingSignup.tsx`)
 
 A 3D floating glass box wrapping the signup flow. Three nested layers so concerns do not collide:
 - `.float-scene` provides perspective (1500px).
@@ -265,11 +289,11 @@ Inside the card:
 - **Eyebrow** (`.float-eyebrow`): mono 11px, `faint`, with a green dot before it (`::before`), text **"Join the waitlist"**.
 - Before submit: the `SignupForm`. After success: the `ReferralCard` replaces the form in the same box (no jump).
 
-### 5.9 SectionMark (`components/sections/SectionMark.tsx`)
+### 5.10 SectionMark (`components/sections/SectionMark.tsx`)
 
 Reusable "spec sheet markings" above each major section: a mono row `[ NN ]` / label / aside, then a centered-masked iridescent hairline carrying a centered file-tag chip (background `bg` so it sits on the line). Margin-bottom 36px. Makes the whole page read as one filed engineering artifact.
 
-### 5.10 Interactive draft card (`MiniDraft` in `HowItWorks.tsx`)
+### 5.11 Interactive draft card (`MiniDraft` in `HowItWorks.tsx`)
 
 A live demo of the Approve step. Monochrome card (`rgba(0,0,0,0.28)`, `border`, radius 12) showing a fake tweet with avatar, **"You"**, **"@yourhandle"**, and a `N/4` queue counter.
 
@@ -281,7 +305,7 @@ State and behavior:
 - Buttons (`.md-btn`) lift on hover (`translateY(-1px)`, slight brightness) and depress on click (`scale(0.96)`). Interactions are locked (`busy`) during the ~820ms flash.
 - Footer micro-status (mono, `faint`, 10px): "Try it · approve, edit, or skip" then "{n} approved here · go on, it's a demo".
 
-### 5.11 SignupForm (`components/SignupForm.tsx`)
+### 5.12 SignupForm (`components/SignupForm.tsx`)
 
 Two-row form, left-aligned, 8px gaps. Email is the only required field.
 
@@ -291,10 +315,11 @@ Two-row form, left-aligned, 8px gaps. Email is the only required field.
 - **Typo suggestion:** if `validateEmail` returns a suggestion, an inline line offers "Did you mean `<fixed>`?" with a "no, send anyway" fallback.
 - **Errors:** inline, `danger` color; the email border turns `danger` when touched + errored.
 - **Reassurance footer** (mono, centered, `faint`, 11.5px): **"No card. No spam. Just early access."**
+- **Referral line** (mono, centered, `faint`, 11px, just under the reassurance): **"Every friend who joins with your link moves you up 5 spots."** Surfaces the referral loop before signup. Appears in both the hero and the CTA because both render this one form. The `5` matches `config.referral.jumpsPerReferral`.
 
 Submitted JSON: `{ email, x_handle?, source: "landing", ref?, website_url }`. The API (`app/api/waitlist/route.ts`) strips a leading `@` from `x_handle`, trims, and caps at 40 chars.
 
-### 5.12 ReferralCard (success state) (`components/ReferralCard.tsx`)
+### 5.13 ReferralCard (success state) (`components/ReferralCard.tsx`)
 
 Replaces the form in the floating box after signup. Animates in with `wlPop`.
 
@@ -303,14 +328,24 @@ Replaces the form in the floating box after signup. Animates in with `wlPop`.
 - **Body** (14px, `muted`, `max-width: 420px`): confirmation sent to the email; "Every friend who joins with your link moves you up `5 spots`. Your position updates live." (The live position comes from `useReferralPosition`; the "5 spots" copy is currently static.)
 - Share-to-X uses this text (the one place "nothing posts" survives, intentionally, because it is the user's own boast): "I just joined the Catalyst waitlist. Autonomous X growth in my own voice, and nothing posts without my approval. Skip the line with my link:"
 
+### 5.14 LiveCount (`components/LiveCount.tsx`)
+
+Client component for live social proof, rendered in the Hero (under the badge) and the CTA (above the form). Fetches `GET /api/waitlist/count` once on mount.
+
+- Renders a green pulsing dot (`live`, `dotPulse`) + a mono `faint` line.
+- **Reveal threshold** (`REVEAL_THRESHOLD = 50`): at or above it, shows **"{count} founders already in line"** with the number counting up once on first reveal. Below it (or while loading, or if the fetch fails), shows the qualitative line **"Be one of the first founders in line"**. The count is never fabricated.
+- **Reduced-motion guard:** the count-up is JS-driven (requestAnimationFrame, easeOutCubic ~850ms), so it checks `matchMedia('(prefers-reduced-motion: reduce)')` and snaps straight to the final number when reduced motion is set. The global CSS guard only covers CSS animations, so this explicit check is required.
+- Props: `t` (theme), `align` ("center" default, "start" available).
+
 ---
 
 ## 6. Motion summary
 
-- **Load entrance:** every `.reveal` element rises 28px and fades in over 0.85s (`cubic-bezier(0.16,0.84,0.3,1)`). Hero staggers badge -> H1 -> subhead -> signup (60 / 160 / 280 / 400ms); header rises at 0ms; audit rows stagger 70ms; clauses stagger 80ms.
+- **Load entrance:** every `.reveal` element rises 28px and fades in over 0.85s (`cubic-bezier(0.16,0.84,0.3,1)`). Hero staggers badge -> counter -> H1 -> subhead -> signup (60 / 110 / 160 / 280 / 400ms); header rises at 0ms; audit rows stagger 70ms; clauses stagger 80ms; FAQ items stagger 70ms.
+- **Live counter count-up:** when the count is shown, it animates from 0 to the real number once on first reveal (JS requestAnimationFrame, easeOutCubic ~850ms), with its own `matchMedia` reduced-motion guard that snaps to the final value.
 - **Ambient loops:** signup box bob (7s), status dots pulse (2.4s), timeline spine light (5s), marquee scroll (36s).
 - **On interaction:** signup box levels and lifts on hover; draft-card buttons lift/depress; draft swaps animate; mono dots glow.
-- **Reduced motion:** all of the above is removed for users who request it.
+- **Reduced motion:** all CSS motion is removed via the global override; the JS count-up additionally checks `matchMedia` and skips straight to the number.
 
 ---
 
@@ -331,8 +366,11 @@ Replaces the form in the floating box after signup. Animates in with `wlPop`.
 | Colors, radius, fonts, CTA label | `lib/theme.ts` |
 | Loaded font families/weights, page `<title>`, OG | `app/layout.tsx` |
 | Animations, grid helpers, grain, grid, focus ring | `app/globals.css` |
-| Hero copy | `components/sections/Hero.tsx` |
-| Steps + interactive card | `components/sections/HowItWorks.tsx` |
+| Hero copy + A/B variant (`?hero=volume`) | `components/sections/Hero.tsx` |
+| Live signup counter (label, threshold) | `components/LiveCount.tsx` |
+| Signup count data | `app/api/waitlist/count/route.ts` |
+| FAQ questions | `components/sections/Faq.tsx` |
+| Steps + interactive card + static example draft | `components/sections/HowItWorks.tsx` |
 | Control clauses + spec tokens | `components/sections/TrustStrip.tsx` |
 | Marquee items | `components/CatalystLanding.tsx` (`Marquee`) |
 | Final CTA copy | `components/sections/Cta.tsx` |

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Theme } from "@/lib/theme";
 import { SectionMark } from "./SectionMark";
 
@@ -12,7 +12,7 @@ type Stage = {
   color: string;
   next: string;
   annot?: string;
-  bright?: boolean;
+  demo?: boolean;
 };
 
 export function HowItWorks({ t }: { t: Theme }) {
@@ -20,18 +20,18 @@ export function HowItWorks({ t }: { t: Theme }) {
     {
       n: "01",
       tag: "Harvest",
-      title: "It reads what you'd read",
+      title: "Reads what you'd read",
       color: t.accentCyan,
       next: t.accent,
       annot: "scans your niche",
-      body: "Catalyst tracks the releases, threads, and arguments in your corner of crypto, AI, and devtools, the same sources you'd open if you had the time. Every draft starts from something real and current.",
+      body: "Catalyst tracks the releases, threads, and arguments in your corner of crypto, AI, and devtools across Reddit, Hacker News, Google News, and X, the same sources you'd open if you had the time. Every draft starts from something real and current.",
     },
     {
       n: "02",
       tag: "Draft",
       title: (
         <>
-          It writes{" "}
+          Writes{" "}
           <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: "rgba(244,244,245,0.55)" }}>
             in your voice
           </span>
@@ -48,13 +48,13 @@ export function HowItWorks({ t }: { t: Theme }) {
       title: "You approve, or you don't",
       color: t.accentMint,
       next: t.accentPeach,
-      bright: true,
-      body: "Open the dashboard, read the queue, ship what's good, kill what isn't. Roughly ten minutes. The decision is always a human one.",
+      demo: true,
+      body: "Open the dashboard, read the queue, ship what's good, kill what isn't. The decision is always a human one.",
     },
     {
       n: "04",
       tag: "Learn",
-      title: "It posts on your call, then sharpens",
+      title: "Posts on your call, then sharpens",
       color: t.accentPeach,
       next: "transparent",
       annot: "ships on schedule",
@@ -68,6 +68,44 @@ export function HowItWorks({ t }: { t: Theme }) {
     letterSpacing: "0.14em",
     textTransform: "uppercase",
   };
+
+  // The highlight rides the scroll: whichever stage sits nearest the viewport
+  // center becomes "active" and lights up (glow behind the numeral, enlarged
+  // node, lit title, dimmed siblings). Defaults to 03 so the no-JS render keeps
+  // the demo-anchored stage emphasized.
+  const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeIndex, setActiveIndex] = useState(2);
+
+  useEffect(() => {
+    let raf = 0;
+    const measure = () => {
+      raf = 0;
+      const mid = window.innerHeight / 2;
+      let best = 0;
+      let bestDist = Infinity;
+      rowRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const dist = Math.abs(r.top + r.height / 2 - mid);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      });
+      setActiveIndex((prev) => (prev === best ? prev : best));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   return (
     <section
@@ -95,26 +133,55 @@ export function HowItWorks({ t }: { t: Theme }) {
       </h2>
 
       <div style={{ position: "relative" }}>
-        {stages.map((s, i) => (
+        {stages.map((s, i) => {
+          const active = i === activeIndex;
+          return (
           <div
             key={s.n}
+            ref={(el) => {
+              rowRefs.current[i] = el;
+            }}
             className="audit-row reveal"
             data-reveal
             style={{ padding: "clamp(28px,4vw,46px) 0", animationDelay: `${i * 70}ms` }}
           >
             {/* col 1: giant numeral (gutter, hidden on mobile) */}
             <div className="rail-gutter" style={{ position: "relative", textAlign: "right", paddingRight: 4 }}>
+              {/* wide glow that rides the active numeral */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  right: -20,
+                  top: "50%",
+                  width: 210,
+                  height: 210,
+                  transform: `translateY(-50%) scale(${active ? 1 : 0.7})`,
+                  background:
+                    "radial-gradient(circle, rgba(255,255,255,0.18), rgba(255,255,255,0.06) 36%, transparent 70%)",
+                  opacity: active ? 1 : 0,
+                  filter: "blur(4px)",
+                  pointerEvents: "none",
+                  transition: "opacity 0.55s ease, transform 0.55s ease",
+                  zIndex: 0,
+                }}
+              />
               <span
                 className="stroke-num"
                 aria-hidden
                 style={{
+                  position: "relative",
+                  zIndex: 1,
                   fontFamily: t.displayFont,
                   fontWeight: 800,
                   fontSize: "clamp(52px,7vw,100px)",
                   lineHeight: 0.85,
                   display: "block",
-                  ...(s.bright
-                    ? { WebkitTextStroke: `1px ${t.accentMint}`, color: "rgba(255,255,255,0.10)" }
+                  transformOrigin: "right center",
+                  transform: active ? "scale(1.06)" : "scale(1)",
+                  transition: "transform 0.55s cubic-bezier(0.16,0.84,0.3,1), color 0.4s ease",
+                  ...(active
+                    ? { WebkitTextStroke: `1px ${t.accentMint}`, color: "rgba(255,255,255,0.12)" }
                     : {}),
                 }}
               >
@@ -160,26 +227,46 @@ export function HowItWorks({ t }: { t: Theme }) {
                   left: "50%",
                   top: 4,
                   transform: "translateX(-50%)",
-                  width: s.bright ? 22 : 14,
-                  height: s.bright ? 22 : 14,
+                  width: active ? 22 : 14,
+                  height: active ? 22 : 14,
                   borderRadius: 99,
-                  border: `1.5px solid ${s.color}`,
+                  border: `1.5px solid ${active ? t.accentMint : s.color}`,
                   background: "#08090a",
-                  boxShadow: s.bright
+                  boxShadow: active
                     ? `0 0 28px ${t.accentMint}, 0 0 60px rgba(255,255,255,0.45)`
                     : `0 0 16px ${s.color}`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...(s.bright ? { animation: "dotPulse 2.4s ease-in-out infinite" } : {}),
+                  transition:
+                    "width 0.45s cubic-bezier(0.16,0.84,0.3,1), height 0.45s cubic-bezier(0.16,0.84,0.3,1), box-shadow 0.45s ease, border-color 0.4s ease",
+                  ...(active ? { animation: "dotPulse 2.4s ease-in-out infinite" } : {}),
                 }}
               >
-                <span style={{ width: 4, height: 4, borderRadius: 99, background: s.color }} />
+                <span
+                  style={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: 99,
+                    background: active ? t.accentMint : s.color,
+                    transition: "background 0.4s ease",
+                  }}
+                />
               </div>
             </div>
 
-            {/* col 3: content */}
-            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+            {/* col 3: content (dims when this stage is not the active one) */}
+            <div
+              style={{
+                position: "relative",
+                zIndex: 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                opacity: active ? 1 : 0.5,
+                transition: "opacity 0.5s ease",
+              }}
+            >
               <div style={{ ...mono, color: t.muted, display: "flex", alignItems: "center", gap: 8 }}>
                 <span>{s.n} / {s.tag}</span>
                 {s.annot && <span style={{ color: t.faint, letterSpacing: "0.06em" }}>· {s.annot}</span>}
@@ -192,7 +279,9 @@ export function HowItWorks({ t }: { t: Theme }) {
                   letterSpacing: "-0.015em",
                   color: t.fg,
                   lineHeight: 1.12,
-                  ...(s.bright ? { paddingLeft: 12, borderLeft: `2px solid ${t.accentMint}` } : {}),
+                  paddingLeft: active ? 12 : 0,
+                  borderLeft: `2px solid ${active ? t.accentMint : "transparent"}`,
+                  transition: "padding-left 0.45s cubic-bezier(0.16,0.84,0.3,1), border-color 0.4s ease",
                 }}
               >
                 {s.title}
@@ -200,25 +289,59 @@ export function HowItWorks({ t }: { t: Theme }) {
               <div style={{ fontFamily: t.uiFont, fontSize: 14, lineHeight: 1.6, color: t.muted, maxWidth: "52ch" }}>
                 {s.body}
               </div>
-              {s.bright && (
+              {s.demo && (
                 <>
                   <div style={{ ...mono, fontSize: 10.5, color: t.accentMint, marginTop: 2 }}>
                     You approve every post · ~10 min/day
                   </div>
-                  <div style={{ maxWidth: 340, marginTop: 10 }}>
+                  <div style={{ maxWidth: 340, marginTop: 12, display: "flex", flexDirection: "column", gap: 16 }}>
+                    <div>
+                      <div style={{ ...mono, fontSize: 10, color: t.faint, marginBottom: 8 }}>
+                        A real draft Catalyst wrote for a devtools founder this week
+                      </div>
+                      <StaticDraft t={t} />
+                    </div>
                     <MiniDraft t={t} />
                   </div>
                 </>
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div style={{ ...mono, fontSize: 11, color: t.faint, marginTop: 28, textAlign: "center" }}>
         ↺ The loop only moves when you say go
       </div>
     </section>
+  );
+}
+
+const EXAMPLE_DRAFT =
+  "watched a senior eng spend an hour fighting our setup script today. that hour is the most honest user research we've done all quarter. fixing it before we ship anything new.";
+
+// Static, always-visible sample so visitors who never click the interactive
+// card still see what a draft looks like. Same chrome as MiniDraft, no buttons.
+function StaticDraft({ t }: { t: Theme }) {
+  return (
+    <div
+      style={{
+        borderRadius: 12,
+        border: `1px solid ${t.border}`,
+        background: "rgba(0,0,0,0.28)",
+        padding: 12,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+        <span style={{ width: 22, height: 22, borderRadius: 99, background: "linear-gradient(135deg,#3a3a3c,#6e6e74)" }} />
+        <span style={{ fontFamily: t.uiFont, fontSize: 12, fontWeight: 600, color: t.fg }}>You</span>
+        <span style={{ fontFamily: t.monoFont, fontSize: 11, color: t.faint }}>@yourhandle</span>
+      </div>
+      <div style={{ fontFamily: t.uiFont, fontSize: 12.5, lineHeight: 1.5, color: t.fg }}>
+        {EXAMPLE_DRAFT}
+      </div>
+    </div>
   );
 }
 
@@ -229,12 +352,11 @@ const DRAFTS = [
   "your roadmap is a list of guesses. ship the smallest one and let the replies tell you which was right.",
 ];
 
-type Flash = null | "approved" | "skipped" | "edited";
+type Flash = null | "approved" | "rejected";
 
 function MiniDraft({ t }: { t: Theme }) {
   const [index, setIndex] = useState(0);
   const [text, setText] = useState(DRAFTS[0]);
-  const [editing, setEditing] = useState(false);
   const [flash, setFlash] = useState<Flash>(null);
   const [approved, setApproved] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -242,9 +364,8 @@ function MiniDraft({ t }: { t: Theme }) {
   const advance = (action: Exclude<Flash, null>) => {
     if (busy) return;
     setBusy(true);
-    setEditing(false);
     setFlash(action);
-    if (action !== "skipped") setApproved((n) => n + 1);
+    if (action !== "rejected") setApproved((n) => n + 1);
     setTimeout(() => {
       const ni = (index + 1) % DRAFTS.length;
       setIndex(ni);
@@ -268,9 +389,8 @@ function MiniDraft({ t }: { t: Theme }) {
     textAlign: "center",
   });
 
-  const flashLabel =
-    flash === "skipped" ? "Skipped" : flash === "edited" ? "Edited · queued" : "Approved · queued";
-  const flashColor = flash === "skipped" ? t.muted : t.accentMint;
+  const flashLabel = flash === "rejected" ? "Rejected" : "Approved · queued";
+  const flashColor = flash === "rejected" ? t.muted : t.accentMint;
 
   return (
     <div
@@ -320,10 +440,10 @@ function MiniDraft({ t }: { t: Theme }) {
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: 11,
-                boxShadow: flash === "skipped" ? "none" : `0 0 14px ${t.accentMint}`,
+                boxShadow: flash === "rejected" ? "none" : `0 0 14px ${t.accentMint}`,
               }}
             >
-              {flash === "skipped" ? "×" : "✓"}
+              {flash === "rejected" ? "×" : "✓"}
             </span>
             {flashLabel}
           </span>
@@ -340,62 +460,22 @@ function MiniDraft({ t }: { t: Theme }) {
           </span>
         </div>
 
-        {editing ? (
-          <textarea
-            className="md-edit"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            autoFocus
-            rows={3}
-            style={{
-              width: "100%",
-              boxSizing: "border-box",
-              resize: "none",
-              fontFamily: t.uiFont,
-              fontSize: 12.5,
-              lineHeight: 1.5,
-              color: t.fg,
-              background: "rgba(0,0,0,0.35)",
-              border: `1px solid ${t.accentMint}`,
-              borderRadius: 8,
-              padding: "8px 10px",
-              marginBottom: 10,
-            }}
-          />
-        ) : (
-          <div style={{ fontFamily: t.uiFont, fontSize: 12.5, lineHeight: 1.5, color: t.fg, marginBottom: 10, minHeight: 54 }}>
-            {text}
-          </div>
-        )}
+        <div style={{ fontFamily: t.uiFont, fontSize: 12.5, lineHeight: 1.5, color: t.fg, marginBottom: 10, minHeight: 54 }}>
+          {text}
+        </div>
 
         <div style={{ display: "flex", gap: 6 }}>
-          {editing ? (
-            <>
-              <button type="button" className="md-btn" style={btn(t.accentMint, true)} onClick={() => advance("edited")}>
-                Save
-              </button>
-              <button type="button" className="md-btn" style={btn(t.fg)} onClick={() => setEditing(false)}>
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              <button type="button" className="md-btn" style={btn(t.accentMint, true)} onClick={() => advance("approved")}>
-                Approve
-              </button>
-              <button type="button" className="md-btn" style={btn(t.fg)} onClick={() => setEditing(true)}>
-                Edit
-              </button>
-              <button type="button" className="md-btn" style={btn(t.fg)} onClick={() => advance("skipped")}>
-                Skip
-              </button>
-            </>
-          )}
+          <button type="button" className="md-btn" style={btn(t.accentMint, true)} onClick={() => advance("approved")}>
+            Approve
+          </button>
+          <button type="button" className="md-btn" style={btn(t.fg)} onClick={() => advance("rejected")}>
+            Reject
+          </button>
         </div>
       </div>
 
       <div style={{ fontFamily: t.monoFont, fontSize: 10, letterSpacing: "0.06em", color: t.faint, marginTop: 9 }}>
-        {approved > 0 ? `${approved} approved here · go on, it's a demo` : "Try it · approve, edit, or skip"}
+        {approved > 0 ? `${approved} approved here · go on, it's a demo` : "Try it · approve or reject"}
       </div>
     </div>
   );

@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { Theme } from "@/lib/theme";
 import type { Signup } from "@/lib/helpers";
 import { FloatingSignup } from "../FloatingSignup";
+import { LiveCount } from "../LiveCount";
 
 export function Hero({
   t,
@@ -13,6 +15,34 @@ export function Hero({
   signup: Signup | null;
   setSignup: (s: Signup | null) => void;
 }) {
+  // A/B hero copy. Default is the qualified variant; append ?hero=volume to the
+  // URL to preview the broader, volume-tuned variant. Read after mount so SSR
+  // and first paint match. Remove this block and keep one headline/subhead to
+  // retire the test.
+  const [variant, setVariant] = useState<"qualified" | "volume">("qualified");
+  useEffect(() => {
+    const v = new URLSearchParams(window.location.search).get("hero");
+    if (v === "volume" || v === "qualified") setVariant(v);
+  }, []);
+
+  const subhead =
+    variant === "volume" ? (
+      <>
+        Catalyst turns what&apos;s happening in your niche into posts{" "}
+        <span style={{ fontStyle: "italic", color: t.fg }}>in your voice</span>,
+        ready to ship. You just pick the good ones.
+      </>
+    ) : (
+      <>
+        Catalyst reads Reddit, Hacker News, and Google News in your niche, drafts
+        posts{" "}
+        <span style={{ fontStyle: "italic", color: t.fg }}>in your voice</span>{" "}
+        from what&apos;s actually happening, and queues them up. You spend about
+        ten minutes a day approving the good ones. Every post still waits for your
+        call.
+      </>
+    );
+
   return (
     <section
       id="top"
@@ -57,21 +87,19 @@ export function Hero({
             fontSize: 11.5,
             letterSpacing: "0.08em",
             color: t.muted,
-            marginBottom: "clamp(28px,4vw,44px)",
+            marginBottom: 12,
             animationDelay: "60ms",
           }}
         >
-          <span
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: 99,
-              background: t.live,
-              boxShadow: `0 0 10px ${t.live}`,
-              animation: "dotPulse 2.4s ease-in-out infinite",
-            }}
-          />
-          Now in private beta · v0.4
+          Pre-launch · v0.4
+        </div>
+
+        {/* live social proof, sits just under the badge */}
+        <div
+          className="reveal"
+          style={{ animationDelay: "110ms", marginBottom: "clamp(28px,4vw,44px)" }}
+        >
+          <LiveCount t={t} />
         </div>
 
         <h1
@@ -104,10 +132,7 @@ export function Hero({
             animationDelay: "280ms",
           }}
         >
-          Catalyst reads your niche, drafts posts{" "}
-          <span style={{ fontStyle: "italic", color: t.fg }}>in your voice</span>,
-          and lines them up for you. Spend ten minutes a day approving the good
-          ones. Every post waits for your call.
+          {subhead}
         </p>
 
         <div

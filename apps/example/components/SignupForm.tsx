@@ -233,6 +233,20 @@ export function SignupForm({ t, onSuccess }: Props) {
       >
         No card. No spam. Just early access.
       </div>
+
+      {/* Referral loop, surfaced before signup. 5 matches config.referral.jumpsPerReferral. */}
+      <div
+        style={{
+          fontFamily: t.monoFont,
+          fontSize: 11,
+          letterSpacing: "0.04em",
+          color: t.faint,
+          textAlign: "center",
+          marginTop: 4,
+        }}
+      >
+        Every friend who joins with your link moves you up 5 spots.
+      </div>
     </form>
   );
 }
