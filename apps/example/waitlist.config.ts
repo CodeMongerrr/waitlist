@@ -11,9 +11,9 @@ import { defineConfig } from "@waitlist-stack/config";
 export default defineConfig({
   brand: {
     name: "Catalyst",
-    tagline: "Grow on X in your own voice, without it becoming your job.",
+    tagline: "Post daily on X, in a voice that's unmistakably yours.",
     description:
-      "Catalyst is an autonomous multi-agent system that researches, drafts, and schedules posts in your own voice. Nothing posts without your approval. Spend about ten minutes a day approving drafts; everything else runs itself.",
+      "Catalyst reads Reddit, Hacker News, and Google News in your niche, drafts posts in your voice from what's actually happening, and queues them. You approve the good ones in about ten minutes a day. Every post waits for your approval.",
     siteUrl: "https://catalyst-waitlist.aayushgiri1234.workers.dev",
     contactEmail: "hello@catalyst.app",
   },

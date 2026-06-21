@@ -8,6 +8,7 @@ import { Header } from "./sections/Header";
 import { Hero } from "./sections/Hero";
 import { HowItWorks } from "./sections/HowItWorks";
 import { TrustStrip } from "./sections/TrustStrip";
+import { Faq } from "./sections/Faq";
 import { Cta } from "./sections/Cta";
 import { Footer } from "./sections/Footer";
 
@@ -33,6 +34,7 @@ export function CatalystLanding() {
         <HowItWorks t={t} />
         <TrustStrip t={t} />
         <Marquee t={t} />
+        <Faq t={t} />
         <Cta t={t} signup={signup} setSignup={setSignup} />
       </main>
       <Footer t={t} />
@@ -42,12 +44,11 @@ export function CatalystLanding() {
 
 function Marquee({ t }: { t: typeof THEME }) {
   const items = [
-    "Ten minutes a day",
     "Sounds like you, not a bot",
     "You approve every post",
     "No auto-post, ever",
     "Built for X, done right",
-    "Researched, not hallucinated",
+    "Researched from Reddit, HN, and Google News",
     "A loop you can audit",
     "Your voice, amplified",
   ];
