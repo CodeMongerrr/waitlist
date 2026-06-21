@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { Theme } from "@/lib/theme";
 import { SectionMark } from "./SectionMark";
 
@@ -21,7 +24,7 @@ export function HowItWorks({ t }: { t: Theme }) {
       color: t.accentCyan,
       next: t.accent,
       annot: "scans your niche",
-      body: "Agents track the releases, threads, and arguments in your corner of crypto, AI, and devtools — the same sources you'd open if you had the time. Every draft starts from something real and current.",
+      body: "Catalyst tracks the releases, threads, and arguments in your corner of crypto, AI, and devtools, the same sources you'd open if you had the time. Every draft starts from something real and current.",
     },
     {
       n: "02",
@@ -55,7 +58,7 @@ export function HowItWorks({ t }: { t: Theme }) {
       color: t.accentPeach,
       next: "transparent",
       annot: "ships on schedule",
-      body: "Approved drafts post on schedule. Your edits become the training — what you approve, change, and reject tightens your voice, so the queue needs less from you, not more.",
+      body: "Approved drafts post on schedule. Your edits are the training: what you approve, change, and reject tightens your voice, so the queue needs less from you each week, not more.",
     },
   ];
 
@@ -71,7 +74,7 @@ export function HowItWorks({ t }: { t: Theme }) {
       id="how"
       style={{ maxWidth: 1180, margin: "0 auto", padding: "clamp(72px,10vw,128px) clamp(20px,5vw,72px)" }}
     >
-      <SectionMark t={t} index="01" label="How it works" aside="Loop" fileTag="— catalyst.loop —" />
+      <SectionMark t={t} index="01" label="How it works" aside="Loop" fileTag="· catalyst.loop ·" />
 
       <h2
         className="reveal"
@@ -99,22 +102,6 @@ export function HowItWorks({ t }: { t: Theme }) {
             data-reveal
             style={{ padding: "clamp(28px,4vw,46px) 0", animationDelay: `${i * 70}ms` }}
           >
-            {/* bright-row halo (un-boxed light pool) */}
-            {s.bright && (
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  inset: "-10% -4%",
-                  zIndex: 0,
-                  pointerEvents: "none",
-                  background:
-                    "radial-gradient(70% 130% at 12% 50%, rgba(255,255,255,0.14), rgba(255,255,255,0.05) 42%, transparent 64%)",
-                  filter: "blur(14px)",
-                }}
-              />
-            )}
-
             {/* col 1: giant numeral (gutter, hidden on mobile) */}
             <div className="rail-gutter" style={{ position: "relative", textAlign: "right", paddingRight: 4 }}>
               <span
@@ -216,7 +203,7 @@ export function HowItWorks({ t }: { t: Theme }) {
               {s.bright && (
                 <>
                   <div style={{ ...mono, fontSize: 10.5, color: t.accentMint, marginTop: 2 }}>
-                    Nothing posts until you click · ~10 min/day
+                    You approve every post · ~10 min/day
                   </div>
                   <div style={{ maxWidth: 340, marginTop: 10 }}>
                     <MiniDraft t={t} />
@@ -235,42 +222,180 @@ export function HowItWorks({ t }: { t: Theme }) {
   );
 }
 
+const DRAFTS = [
+  "the underrated skill in shipping fast: deleting the feature you were most excited to build.",
+  "spent the morning deleting code. net negative 400 lines, net positive product. the best kind of progress.",
+  "the hardest part of going solo isn't the work. it's deciding, every day, what not to do.",
+  "your roadmap is a list of guesses. ship the smallest one and let the replies tell you which was right.",
+];
+
+type Flash = null | "approved" | "skipped" | "edited";
+
 function MiniDraft({ t }: { t: Theme }) {
+  const [index, setIndex] = useState(0);
+  const [text, setText] = useState(DRAFTS[0]);
+  const [editing, setEditing] = useState(false);
+  const [flash, setFlash] = useState<Flash>(null);
+  const [approved, setApproved] = useState(0);
+  const [busy, setBusy] = useState(false);
+
+  const advance = (action: Exclude<Flash, null>) => {
+    if (busy) return;
+    setBusy(true);
+    setEditing(false);
+    setFlash(action);
+    if (action !== "skipped") setApproved((n) => n + 1);
+    setTimeout(() => {
+      const ni = (index + 1) % DRAFTS.length;
+      setIndex(ni);
+      setText(DRAFTS[ni]);
+      setFlash(null);
+      setBusy(false);
+    }, 820);
+  };
+
   const btn = (color: string, solid?: boolean): React.CSSProperties => ({
     flex: 1,
     fontFamily: t.monoFont,
     fontSize: 10.5,
     letterSpacing: "0.06em",
     textTransform: "uppercase",
-    padding: "7px 4px",
+    padding: "8px 4px",
     borderRadius: 7,
     border: `1px solid ${solid ? color : t.border}`,
     background: solid ? color : "transparent",
     color: solid ? "#04130d" : t.muted,
     textAlign: "center",
   });
+
+  const flashLabel =
+    flash === "skipped" ? "Skipped" : flash === "edited" ? "Edited · queued" : "Approved · queued";
+  const flashColor = flash === "skipped" ? t.muted : t.accentMint;
+
   return (
     <div
       style={{
+        position: "relative",
+        overflow: "hidden",
         borderRadius: 12,
         border: `1px solid ${t.border}`,
         background: "rgba(0,0,0,0.28)",
         padding: 12,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <span style={{ width: 22, height: 22, borderRadius: 99, background: "linear-gradient(135deg,#3a3a3c,#6e6e74)" }} />
-        <span style={{ fontFamily: t.uiFont, fontSize: 12, fontWeight: 600, color: t.fg }}>You</span>
-        <span style={{ fontFamily: t.monoFont, fontSize: 11, color: t.faint }}>@yourhandle</span>
+      {flash && (
+        <div
+          className="md-flash"
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(8,9,10,0.74)",
+            backdropFilter: "blur(2px)",
+            WebkitBackdropFilter: "blur(2px)",
+          }}
+        >
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              fontFamily: t.monoFont,
+              fontSize: 11,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: flashColor,
+            }}
+          >
+            <span
+              style={{
+                width: 18,
+                height: 18,
+                borderRadius: 99,
+                border: `1.5px solid ${flashColor}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 11,
+                boxShadow: flash === "skipped" ? "none" : `0 0 14px ${t.accentMint}`,
+              }}
+            >
+              {flash === "skipped" ? "×" : "✓"}
+            </span>
+            {flashLabel}
+          </span>
+        </div>
+      )}
+
+      <div key={index} className="md-enter">
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <span style={{ width: 22, height: 22, borderRadius: 99, background: "linear-gradient(135deg,#3a3a3c,#6e6e74)" }} />
+          <span style={{ fontFamily: t.uiFont, fontSize: 12, fontWeight: 600, color: t.fg }}>You</span>
+          <span style={{ fontFamily: t.monoFont, fontSize: 11, color: t.faint }}>@yourhandle</span>
+          <span style={{ marginLeft: "auto", fontFamily: t.monoFont, fontSize: 10.5, color: t.faint }}>
+            {index + 1}/{DRAFTS.length}
+          </span>
+        </div>
+
+        {editing ? (
+          <textarea
+            className="md-edit"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            autoFocus
+            rows={3}
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              resize: "none",
+              fontFamily: t.uiFont,
+              fontSize: 12.5,
+              lineHeight: 1.5,
+              color: t.fg,
+              background: "rgba(0,0,0,0.35)",
+              border: `1px solid ${t.accentMint}`,
+              borderRadius: 8,
+              padding: "8px 10px",
+              marginBottom: 10,
+            }}
+          />
+        ) : (
+          <div style={{ fontFamily: t.uiFont, fontSize: 12.5, lineHeight: 1.5, color: t.fg, marginBottom: 10, minHeight: 54 }}>
+            {text}
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: 6 }}>
+          {editing ? (
+            <>
+              <button type="button" className="md-btn" style={btn(t.accentMint, true)} onClick={() => advance("edited")}>
+                Save
+              </button>
+              <button type="button" className="md-btn" style={btn(t.fg)} onClick={() => setEditing(false)}>
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <button type="button" className="md-btn" style={btn(t.accentMint, true)} onClick={() => advance("approved")}>
+                Approve
+              </button>
+              <button type="button" className="md-btn" style={btn(t.fg)} onClick={() => setEditing(true)}>
+                Edit
+              </button>
+              <button type="button" className="md-btn" style={btn(t.fg)} onClick={() => advance("skipped")}>
+                Skip
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      <div style={{ fontFamily: t.uiFont, fontSize: 12.5, lineHeight: 1.5, color: t.fg, marginBottom: 10 }}>
-        the underrated skill in shipping fast: deleting the feature you were most
-        excited to build.
-      </div>
-      <div style={{ display: "flex", gap: 6 }}>
-        <span style={btn(t.accentMint, true)}>Approve</span>
-        <span style={btn(t.fg)}>Edit</span>
-        <span style={btn(t.fg)}>Skip</span>
+
+      <div style={{ fontFamily: t.monoFont, fontSize: 10, letterSpacing: "0.06em", color: t.faint, marginTop: 9 }}>
+        {approved > 0 ? `${approved} approved here · go on, it's a demo` : "Try it · approve, edit, or skip"}
       </div>
     </div>
   );

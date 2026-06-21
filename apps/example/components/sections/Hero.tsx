@@ -2,8 +2,7 @@
 
 import type { Theme } from "@/lib/theme";
 import type { Signup } from "@/lib/helpers";
-import { SignupForm } from "../SignupForm";
-import { ReferralCard } from "../ReferralCard";
+import { FloatingSignup } from "../FloatingSignup";
 
 export function Hero({
   t,
@@ -59,6 +58,7 @@ export function Hero({
             letterSpacing: "0.08em",
             color: t.muted,
             marginBottom: "clamp(28px,4vw,44px)",
+            animationDelay: "60ms",
           }}
         >
           <span
@@ -75,6 +75,7 @@ export function Hero({
         </div>
 
         <h1
+          className="reveal"
           style={{
             fontFamily: t.displayFont,
             fontWeight: 800,
@@ -85,12 +86,14 @@ export function Hero({
             color: t.fg,
             textWrap: "balance",
             maxWidth: 1000,
+            animationDelay: "160ms",
           }}
         >
           Grow on X <span className="iris-text">without</span> the full-time job.
         </h1>
 
         <p
+          className="reveal"
           style={{
             fontFamily: t.uiFont,
             fontSize: "clamp(16px,1.7vw,20px)",
@@ -98,21 +101,20 @@ export function Hero({
             color: t.muted,
             margin: "clamp(24px,3vw,36px) 0 0",
             maxWidth: 660,
+            animationDelay: "280ms",
           }}
         >
-          Catalyst watches the internet for what&apos;s worth posting about,
-          drafts it{" "}
+          Catalyst reads your niche, drafts posts{" "}
           <span style={{ fontStyle: "italic", color: t.fg }}>in your voice</span>,
-          and waits for your approval. Join the private beta and be first through
-          the door.
+          and lines them up for you. Spend ten minutes a day approving the good
+          ones. Every post waits for your call.
         </p>
 
-        <div style={{ width: "100%", maxWidth: 560, marginTop: "clamp(32px,4vw,44px)" }}>
-          {!signup ? (
-            <SignupForm t={t} onSuccess={setSignup} />
-          ) : (
-            <ReferralCard t={t} signup={signup} onDone={() => setSignup(null)} />
-          )}
+        <div
+          className="reveal"
+          style={{ width: "100%", maxWidth: 560, marginTop: "clamp(32px,4vw,52px)", animationDelay: "400ms" }}
+        >
+          <FloatingSignup t={t} signup={signup} setSignup={setSignup} />
         </div>
       </div>
     </section>

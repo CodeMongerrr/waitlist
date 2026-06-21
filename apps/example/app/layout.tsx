@@ -6,7 +6,7 @@ import "./globals.css";
 
 // Minimal monochrome direction: one neutral heavy grotesque (Inter) carries
 // display + body; IBM Plex Mono is the labels/markings voice. No serif, no
-// decorative families — the look is precise and quiet, matching the product.
+// decorative families, the look is precise and quiet, matching the product.
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -21,7 +21,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: `${config.brand.name} — ${config.brand.tagline}`,
+  title: `${config.brand.name} · ${config.brand.tagline}`,
   description: config.brand.description,
   applicationName: config.brand.name,
   metadataBase: new URL(config.brand.siteUrl),
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: config.brand.name,
-    title: `${config.brand.name} — ${config.brand.tagline}`,
+    title: `${config.brand.name} · ${config.brand.tagline}`,
     description: config.brand.description,
     url: config.brand.siteUrl,
     images: [{ url: "/api/og" }],

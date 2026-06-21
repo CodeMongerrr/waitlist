@@ -83,7 +83,7 @@ export default async function AdminPage({
   const csvHref = (() => {
     const sp = new URLSearchParams();
     if (q) sp.set("q", q);
-    // "queued" is a synthetic combo of pending + failed — the CSV route
+    // "queued" is a synthetic combo of pending + failed; the CSV route
     // recognizes the same name and expands it to IN ('pending','failed').
     if (filter !== "all") sp.set("status", filter);
     const qs = sp.toString();

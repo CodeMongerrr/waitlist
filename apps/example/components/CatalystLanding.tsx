@@ -44,9 +44,9 @@ function Marquee({ t }: { t: typeof THEME }) {
   const items = [
     "Ten minutes a day",
     "Sounds like you, not a bot",
-    "Nothing posts without your click",
+    "You approve every post",
     "No auto-post, ever",
-    "X only, done seriously",
+    "Built for X, done right",
     "Researched, not hallucinated",
     "A loop you can audit",
     "Your voice, amplified",

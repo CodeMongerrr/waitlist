@@ -2,8 +2,7 @@
 
 import type { Theme } from "@/lib/theme";
 import type { Signup } from "@/lib/helpers";
-import { SignupForm } from "../SignupForm";
-import { ReferralCard } from "../ReferralCard";
+import { FloatingSignup } from "../FloatingSignup";
 
 export function Cta({
   t,
@@ -82,15 +81,12 @@ export function Cta({
             maxWidth: 520,
           }}
         >
-          Join the waitlist for early access. Ten minutes a day, your voice, your
-          call on every post.
+          Let Catalyst do the reading and the first draft. You keep your voice,
+          your judgment, and ten minutes a day. Every post waits for your
+          approval.
         </p>
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
-          {!signup ? (
-            <SignupForm t={t} onSuccess={setSignup} />
-          ) : (
-            <ReferralCard t={t} signup={signup} onDone={() => setSignup(null)} />
-          )}
+          <FloatingSignup t={t} signup={signup} setSignup={setSignup} />
         </div>
       </div>
     </section>

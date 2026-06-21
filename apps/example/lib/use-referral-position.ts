@@ -46,7 +46,7 @@ export function useReferralPosition(
       }
     };
 
-    // Don't fire immediately — the signup response already gave us a
+    // Don't fire immediately; the signup response already gave us a
     // position. First poll happens after `intervalMs` so the user sees a
     // fresh number when activity actually happens.
     const id = setInterval(tick, intervalMs);

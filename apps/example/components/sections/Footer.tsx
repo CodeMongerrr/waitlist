@@ -97,7 +97,7 @@ export function Footer({ t }: { t: Theme }) {
           </div>
           <div style={{ fontFamily: t.uiFont, fontSize: 13.5, lineHeight: 1.6, color: t.muted, maxWidth: 360 }}>
             Catalyst drafts and schedules your X posts in your voice. You approve
-            every one. Nothing posts without your click.
+            every one before it goes out.
           </div>
         </div>
 
@@ -110,7 +110,7 @@ export function Footer({ t }: { t: Theme }) {
           </div>
           <div>
             <div style={colHead}>Catalyst</div>
-            <span style={{ ...link, color: t.faint }}>X only</span>
+            <span style={{ ...link, color: t.faint }}>Built for X</span>
             <span style={{ ...link, color: t.faint }}>Human-approved</span>
             <span style={{ ...link, color: t.faint }}>Private beta</span>
           </div>
@@ -135,7 +135,7 @@ export function Footer({ t }: { t: Theme }) {
           color: t.faint,
         }}
       >
-        <span>© 2026 Catalyst · X only · Human-approved</span>
+        <span>© 2026 Catalyst · Built for X · Human-approved</span>
         <span
           style={{
             display: "inline-flex",

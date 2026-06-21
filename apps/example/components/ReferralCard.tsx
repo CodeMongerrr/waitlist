@@ -30,7 +30,7 @@ export function ReferralCard({ t, signup, onDone, compact = false }: Props) {
 
   const shareX = () => {
     const text =
-      "I just joined the Catalyst waitlist — autonomous X growth in my own voice, and nothing posts without my approval. Skip the line with my link:";
+      "I just joined the Catalyst waitlist. Autonomous X growth in my own voice, and nothing posts without my approval. Skip the line with my link:";
     const u = `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(u, "_blank", "noopener");
   };

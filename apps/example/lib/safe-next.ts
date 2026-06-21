@@ -3,9 +3,9 @@
 //
 //   /admin             ok
 //   /admin/users?x=1   ok
-//   //evil.com         BLOCKED — protocol-relative URL, browsers treat as offsite
-//   https://evil.com   BLOCKED — absolute URL
-//   /\evil.com         BLOCKED — Edge/IE quirk; backslash treated as path separator
+//   //evil.com         BLOCKED: protocol-relative URL, browsers treat as offsite
+//   https://evil.com   BLOCKED: absolute URL
+//   /\evil.com         BLOCKED: Edge/IE quirk; backslash treated as path separator
 //
 // Anything that doesn't pass falls back to the default admin path so a
 // crafted ?next= can't redirect a logged-in user offsite.

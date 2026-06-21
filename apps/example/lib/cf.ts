@@ -28,7 +28,7 @@ export async function env(): Promise<AppEnv> {
     const ctx = await getCloudflareContext({ async: true });
     cf = ctx.env as unknown as Partial<AppEnv>;
   } catch {
-    // No Cloudflare runtime — fall through to dev fallback.
+    // No Cloudflare runtime; fall through to dev fallback.
   }
   if (!cf || !cf.DB) {
     const { getDevD1 } = await import("./dev-db");

@@ -14,22 +14,22 @@ export function TrustStrip({ t }: { t: Theme }) {
 
   const clauses = [
     {
-      no: "§01",
+      no: "01",
       marker: "In control",
       dot: t.accentMint,
       statement: (
         <>
-          Nothing posts{" "}
+          You approve{" "}
           <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.fg }}>
-            without you
+            every post
           </span>
         </>
       ),
-      sub: "No auto-post mode. No silent timer. If you don't click, nothing ships. If you go quiet, your account goes quiet.",
+      sub: "No auto-post mode, no silent timer. Drafts wait in your queue until you say go. Approve what's good, skip the rest, on your schedule.",
       bright: true,
     },
     {
-      no: "§02",
+      no: "02",
       marker: "In your voice",
       dot: t.accent,
       statement: (
@@ -40,18 +40,18 @@ export function TrustStrip({ t }: { t: Theme }) {
           </span>
         </>
       ),
-      sub: "The point is to sound like you on a day you can't write — not like an AI tweet generator chasing numbers. If a draft doesn't sound like you, reject it, and it learns.",
+      sub: "The point is to sound like you on a day you can't write, not like an AI tweet generator chasing numbers. If a draft doesn't sound like you, reject it, and it learns.",
     },
     {
-      no: "§03",
+      no: "03",
       marker: "Scoped on purpose",
       dot: t.accentCyan,
       statement: (
         <>
           <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.fg }}>
-            X only
+            One platform
           </span>
-          , on purpose
+          , done right
         </>
       ),
       sub: "One platform, done seriously. No LinkedIn cross-posting, no follower promises, no virality theater. Just consistent posts you'd put your name on.",
@@ -61,7 +61,7 @@ export function TrustStrip({ t }: { t: Theme }) {
   const sigTokens = [
     { t: "No auto-posting", c: t.accentMint },
     { t: "No follower guarantees", c: t.accent },
-    { t: "X only", c: t.accentCyan },
+    { t: "Built for X", c: t.accentCyan },
     { t: "Human-approved", c: t.accentPeach },
   ];
 
@@ -70,7 +70,7 @@ export function TrustStrip({ t }: { t: Theme }) {
       id="control"
       style={{ maxWidth: 1180, margin: "0 auto", padding: "clamp(72px,10vw,128px) clamp(20px,5vw,72px)" }}
     >
-      <SectionMark t={t} index="02" label="You are in control" aside="Control" fileTag="— catalyst.control —" />
+      <SectionMark t={t} index="02" label="You are in control" aside="Control" fileTag="· catalyst.control ·" />
 
       <h2
         className="reveal"
@@ -129,7 +129,7 @@ export function TrustStrip({ t }: { t: Theme }) {
                     flex: "none",
                   }}
                 />
-                {c.no} — {c.marker}
+                {c.no} · {c.marker}
               </div>
               <div>
                 <div
@@ -179,7 +179,10 @@ export function TrustStrip({ t }: { t: Theme }) {
           color: t.muted,
         }}
       >
-        <span style={{ color: t.faint }}>◆ Spec</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 7, color: t.faint }}>
+          <span style={{ width: 6, height: 6, borderRadius: 99, background: t.faint }} />
+          Spec
+        </span>
         {sigTokens.map((s) => (
           <span key={s.t} style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
             <span
@@ -210,8 +213,8 @@ export function TrustStrip({ t }: { t: Theme }) {
         }}
       >
         Built for solo founders, DevRel engineers, and technical creators in
-        crypto, AI, and devtools — people for whom X is pipeline, hiring, and
-        reputation, not a hobby.
+        crypto, AI, and devtools. For people whose X account is pipeline, hiring,
+        and reputation, not a hobby.
       </div>
       <div style={{ textAlign: "center", marginTop: 10, ...mono, fontSize: 10.5, color: t.faint }}>
         We never post without an explicit approval click · Not affiliated with X

@@ -1,4 +1,4 @@
-// Brand tokens for the Catalyst landing — minimal monochrome direction.
+// Brand tokens for the Catalyst landing: minimal monochrome direction.
 // Near-black canvas, white type, gray support, white primary action. The only
 // color anywhere is `live` (the green "in private beta" status dot). Keeping
 // the accent* token names (now grayscale) means existing components re-skin

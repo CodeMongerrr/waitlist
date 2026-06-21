@@ -13,6 +13,7 @@ export function Header({ t }: { t: Theme }) {
       }}
     >
       <div
+        className="reveal"
         style={{
           maxWidth: 1200,
           margin: "0 auto",
