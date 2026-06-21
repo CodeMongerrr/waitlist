@@ -51,10 +51,11 @@ export function ReferralCard({ t, signup, onDone, compact = false }: Props) {
       </div>
       <div
         style={{
-          fontSize: compact ? 40 : 52,
+          fontFamily: t.displayFont,
+          fontSize: compact ? 44 : 56,
           lineHeight: 1,
           letterSpacing: "-0.03em",
-          fontWeight: 700,
+          fontWeight: 800,
           color: t.fg,
           marginBottom: 8,
         }}

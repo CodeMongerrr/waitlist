@@ -5,10 +5,10 @@ import type { Signup } from "@/lib/helpers";
 import { SignupForm } from "../SignupForm";
 import { ReferralCard } from "../ReferralCard";
 
-const CHIPS = [
-  "Nothing posts without approval",
-  "Your voice, not a bot",
-  "~10 min a day",
+const CHIPS: { label: string; dot: keyof Pick<Theme, "accentCyan" | "accentMint" | "accent"> }[] = [
+  { label: "Consistent, not consuming", dot: "accentCyan" },
+  { label: "Sounds like you", dot: "accent" },
+  { label: "Nothing posts without approval", dot: "accentMint" },
 ];
 
 export function Hero({
@@ -20,148 +20,228 @@ export function Hero({
   signup: Signup | null;
   setSignup: (s: Signup | null) => void;
 }) {
+  const mono: React.CSSProperties = {
+    fontFamily: t.monoFont,
+    fontSize: 11,
+    letterSpacing: "0.16em",
+    textTransform: "uppercase",
+  };
   return (
     <section
+      id="top"
       style={{
-        maxWidth: 1080,
-        margin: "0 auto",
-        padding: "clamp(56px,8vw,104px) 24px clamp(40px,6vw,72px)",
+        position: "relative",
+        minHeight: "100svh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
       }}
     >
+      {/* Aurora signature blob (the first of exactly two glow peaks). */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "-16%",
+          left: "50%",
+          width: "min(1120px,128vw)",
+          height: 780,
+          transform: "translateX(-50%)",
+          filter: "blur(92px) saturate(140%)",
+          opacity: 0.9,
+          zIndex: 0,
+          pointerEvents: "none",
+          animation: "auroraDrift 22s ease-in-out infinite alternate",
+          background:
+            "radial-gradient(60% 80% at 22% 18%, rgba(124,92,255,0.50) 0%, rgba(124,92,255,0) 60%), radial-gradient(50% 70% at 80% 26%, rgba(35,213,224,0.36) 0%, rgba(35,213,224,0) 55%), radial-gradient(55% 65% at 62% 82%, rgba(91,233,185,0.20) 0%, rgba(91,233,185,0) 60%), conic-gradient(from 200deg at 50% 60%, rgba(255,158,122,0.30), rgba(124,92,255,0.28), rgba(35,213,224,0.28), rgba(255,158,122,0.30))",
+        }}
+      />
+      <div className="hero-grid" />
+
       <div
         style={{
+          position: "relative",
+          zIndex: 2,
+          flex: 1,
           display: "flex",
-          flexWrap: "wrap",
-          gap: 48,
-          alignItems: "flex-start",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: 1180,
+          margin: "0 auto",
+          padding: "104px clamp(20px,5vw,72px) 56px",
         }}
       >
-        <div style={{ flex: "1 1 440px", minWidth: 0 }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "6px 12px",
-              border: `1px solid ${t.border}`,
-              borderRadius: 999,
-              marginBottom: 24,
-              animation: "wlRise .5s ease both",
-            }}
-          >
-            <span
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "clamp(32px,5vw,64px)",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          {/* Copy column */}
+          <div style={{ flex: "1 1 480px", minWidth: 0 }}>
+            <div
               style={{
-                width: 7,
-                height: 7,
-                borderRadius: 99,
-                background: t.accent,
-                display: "block",
-              }}
-            />
-            <span
-              style={{
-                fontFamily: t.monoFont,
-                fontSize: 11.5,
-                letterSpacing: "0.04em",
+                ...mono,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 9,
+                padding: "6px 12px",
+                borderRadius: 999,
+                border: `1px solid ${t.border}`,
                 color: t.muted,
+                marginBottom: 22,
               }}
             >
-              Autonomous X growth · human-approved
-            </span>
-          </div>
-          <h1
-            style={{
-              fontFamily: t.uiFont,
-              fontSize: "clamp(34px,5.4vw,60px)",
-              lineHeight: 1.04,
-              letterSpacing: "-0.035em",
-              fontWeight: 700,
-              margin: "0 0 22px",
-              color: t.fg,
-              textWrap: "balance",
-              maxWidth: 640,
-            }}
-          >
-            Grow on X in your own voice. Without it becoming your job.
-          </h1>
-          <p
-            style={{
-              fontFamily: t.uiFont,
-              fontSize: "clamp(16px,1.6vw,19px)",
-              lineHeight: 1.6,
-              color: t.muted,
-              margin: "0 0 28px",
-              maxWidth: 560,
-            }}
-          >
-            Catalyst researches, drafts, and schedules posts that sound like you.
-            You spend about ten minutes a day approving them. Nothing goes out
-            without your say-so.
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {CHIPS.map((c) => (
               <span
-                key={c}
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 7,
-                  fontFamily: t.uiFont,
-                  fontSize: 13,
-                  color: t.fg,
-                  padding: "7px 12px",
-                  background: t.bgAlt,
-                  border: `1px solid ${t.border}`,
-                  borderRadius: t.radius,
+                  width: 7,
+                  height: 7,
+                  borderRadius: 99,
+                  background: t.accentCyan,
+                  boxShadow: `0 0 12px ${t.accentCyan}`,
+                  animation: "dotPulse 2s infinite",
+                }}
+              />
+              Catalyst / X growth system
+            </div>
+
+            <h1
+              style={{
+                fontFamily: t.displayFont,
+                fontWeight: 800,
+                fontSize: "clamp(40px,7vw,88px)",
+                lineHeight: 0.98,
+                letterSpacing: "-0.03em",
+                margin: "0 0 24px",
+                color: t.fg,
+                textWrap: "balance",
+              }}
+            >
+              Show up on X <span className="iris-text">every day</span>,
+              <br />
+              written{" "}
+              <span
+                style={{
+                  fontFamily: t.serifFont,
+                  fontStyle: "italic",
+                  fontWeight: 400,
+                  color: "#C0A6FF",
                 }}
               >
-                <span style={{ color: t.accent }}>✓</span>
-                {c}
+                in your voice
               </span>
-            ))}
-          </div>
-        </div>
+              ,<br />
+              posted on your call.
+            </h1>
 
-        <div style={{ flex: "1 1 360px", minWidth: 0, maxWidth: 440 }}>
-          <div
-            style={{
-              background: t.bgAlt,
-              border: `1px solid ${t.border}`,
-              borderRadius: t.modalRadius,
-              padding: 22,
-            }}
-          >
-            {!signup ? (
-              <>
-                <div
+            <p
+              style={{
+                fontFamily: t.uiFont,
+                fontSize: "clamp(16px,1.6vw,19px)",
+                lineHeight: 1.6,
+                color: t.muted,
+                maxWidth: "48ch",
+                margin: "0 0 28px",
+              }}
+            >
+              Catalyst is an autonomous multi-agent system that researches,
+              drafts, and schedules your X posts. You spend about ten minutes a
+              day approving drafts. Nothing is ever posted without your click.
+            </p>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {CHIPS.map((c) => (
+                <span
+                  key={c.label}
                   style={{
-                    fontFamily: t.uiFont,
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: t.fg,
-                    marginBottom: 4,
-                  }}
-                >
-                  Join the waitlist
-                </div>
-                <div
-                  style={{
-                    fontFamily: t.uiFont,
-                    fontSize: 13,
+                    ...mono,
+                    fontSize: 10.5,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "7px 12px",
+                    borderRadius: 999,
+                    border: `1px solid ${t.border}`,
+                    background: "rgba(255,255,255,0.03)",
                     color: t.muted,
-                    marginBottom: 16,
-                    lineHeight: 1.5,
                   }}
                 >
-                  Early access and a spot in line. Email is all we need.
-                </div>
-                <SignupForm t={t} onSuccess={setSignup} />
-              </>
-            ) : (
-              <ReferralCard t={t} signup={signup} onDone={() => setSignup(null)} />
-            )}
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: 99,
+                      background: t[c.dot],
+                      boxShadow: `0 0 10px ${t[c.dot]}`,
+                    }}
+                  />
+                  {c.label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Form column */}
+          <div style={{ flex: "1 1 380px", minWidth: 0, maxWidth: 460 }}>
+            <div
+              className="glass"
+              style={{ borderRadius: 16, padding: "clamp(20px,3vw,28px)" }}
+            >
+              {!signup ? (
+                <>
+                  <div
+                    style={{
+                      fontFamily: t.displayFont,
+                      fontSize: 19,
+                      fontWeight: 700,
+                      color: t.fg,
+                      marginBottom: 4,
+                    }}
+                  >
+                    Join the waitlist
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: t.uiFont,
+                      fontSize: 13,
+                      color: t.muted,
+                      marginBottom: 18,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    Early access and a spot in line. Email is all we need.
+                  </div>
+                  <SignupForm t={t} onSuccess={setSignup} />
+                </>
+              ) : (
+                <ReferralCard
+                  t={t}
+                  signup={signup}
+                  onDone={() => setSignup(null)}
+                />
+              )}
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Scroll cue */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          textAlign: "center",
+          paddingBottom: 26,
+          ...mono,
+          color: t.faint,
+        }}
+      >
+        <span style={{ display: "inline-block", animation: "scrollBob 2s ease-in-out infinite" }}>
+          Scroll / 01—04
+        </span>
       </div>
     </section>
   );

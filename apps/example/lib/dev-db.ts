@@ -29,22 +29,37 @@ export async function getDevD1(): Promise<D1Database> {
     ]);
 
   const sqlite = new Database(":memory:");
-  // Resolve migrations relative to the workspace root. Works under
-  // pnpm workspaces because @waitlist-stack/db is symlinked into
-  // node_modules/@waitlist-stack/db pointing at packages/db.
-  const migrationsDir = join(
-    process.cwd(),
-    "..",
-    "..",
-    "packages",
-    "db",
-    "migrations",
-  );
+  // Resolve the migrations dir robustly. The dev server's runtime cwd is not
+  // guaranteed (Next can render in a worker), so try several candidates and
+  // pick the first that actually contains .sql files: the app's own copy
+  // (apps/example/migrations), then the monorepo package source from either
+  // the app dir or the repo root.
+  const hasSql = (d: string): boolean => {
+    try {
+      return readdirSync(d).some((f) => f.endsWith(".sql"));
+    } catch {
+      return false;
+    }
+  };
+  const candidates = [
+    join(process.cwd(), "migrations"),
+    join(process.cwd(), "..", "..", "packages", "db", "migrations"),
+    join(process.cwd(), "packages", "db", "migrations"),
+  ];
+  const migrationsDir = candidates.find(hasSql);
+  if (!migrationsDir) {
+    throw new Error(
+      `[dev-db] no migrations found. Looked in: ${candidates.join(", ")}`,
+    );
+  }
+  let applied = 0;
   for (const file of readdirSync(migrationsDir).sort()) {
     if (file.endsWith(".sql")) {
       sqlite.exec(readFileSync(join(migrationsDir, file), "utf8"));
+      applied++;
     }
   }
+  console.warn(`[dev-db] applied ${applied} migrations from ${migrationsDir}`);
 
   console.warn(
     "\n[dev-db] No D1 binding present. Using in-memory SQLite for local dev.\n" +

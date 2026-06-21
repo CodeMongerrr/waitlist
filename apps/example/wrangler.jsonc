@@ -24,7 +24,6 @@
   },
   "observability": { "enabled": true },
   "workers_dev": true,
-  "migrations_dir": "migrations",
 
   // Custom domain. Uncomment and fill once a domain is added in Cloudflare.
   // "routes": [

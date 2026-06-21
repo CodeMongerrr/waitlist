@@ -1,32 +1,42 @@
 import type { Metadata, Viewport } from "next";
-import { Newsreader, Source_Serif_4, Inter, JetBrains_Mono } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Space_Grotesk,
+  IBM_Plex_Mono,
+  Instrument_Serif,
+} from "next/font/google";
 import { buildAllJsonLd } from "@waitlist-stack/seo";
 import config from "../waitlist.config";
 import "./globals.css";
 
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
+// Type system for the "Iridescent Spec Room" direction:
+// Bricolage Grotesque = oversized editorial display; Space Grotesk = body/UI;
+// IBM Plex Mono = the "markings" voice (indices, labels, chips, colophon);
+// Instrument Serif italic = reserved jewel for the phrase "in your voice".
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
+  display: "swap",
+});
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
+});
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+});
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
   style: ["normal", "italic"],
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const sourceSerif = Source_Serif_4({
-  variable: "--font-source-serif",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -55,7 +65,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08090a",
+  themeColor: "#08090A",
   colorScheme: "dark",
 };
 
@@ -66,7 +76,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${newsreader.variable} ${sourceSerif.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${bricolage.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${instrumentSerif.variable}`}
     >
       <head>
         {jsonLd.map((block, i) => (

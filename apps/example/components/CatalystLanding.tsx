@@ -13,10 +13,9 @@ import { Footer } from "./sections/Footer";
 
 const t = THEME;
 
-// Single-scroll Catalyst landing. One signup state is shared between the hero
-// form and the final CTA, so submitting either flips both to the referral
-// success card. useReferralPosition polls /api/waitlist/me/{code} to keep the
-// displayed queue position live as referrals land.
+// "Iridescent Spec Room" single-scroll landing. One signup state is shared
+// between the hero form and the final CTA, so submitting either flips both to
+// the referral success card. useReferralPosition keeps the queue position live.
 export function CatalystLanding() {
   const [signup, setSignup] = useState<Signup | null>(null);
 
@@ -26,15 +25,66 @@ export function CatalystLanding() {
   useReferralPosition(signup?.code, onLivePosition);
 
   return (
-    <div id="top" style={{ background: t.bg, color: t.fg, minHeight: "100vh" }}>
+    <div style={{ background: t.bg, color: t.fg, minHeight: "100vh" }}>
+      <div className="grain" aria-hidden />
       <Header t={t} />
       <main>
         <Hero t={t} signup={signup} setSignup={setSignup} />
         <HowItWorks t={t} />
         <TrustStrip t={t} />
+        <Marquee t={t} />
         <Cta t={t} signup={signup} setSignup={setSignup} />
       </main>
       <Footer t={t} />
+    </div>
+  );
+}
+
+function Marquee({ t }: { t: typeof THEME }) {
+  const items = [
+    "X only",
+    "Nothing posts without your click",
+    "Sounds like you, not a bot",
+    "~10 min a day",
+    "For founders · DevRel · indie hackers",
+    "No virality promises",
+    "You stay in control",
+  ];
+  const Strip = () => (
+    <span style={{ display: "inline-flex", alignItems: "center" }}>
+      {items.map((x, i) => (
+        <span key={i} style={{ display: "inline-flex", alignItems: "center" }}>
+          <span
+            style={{
+              padding: "0 22px",
+              fontFamily: t.monoFont,
+              fontSize: 12,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: t.muted,
+            }}
+          >
+            {x}
+          </span>
+          <span style={{ color: t.accent }}>◆</span>
+        </span>
+      ))}
+    </span>
+  );
+  return (
+    <div
+      className="marquee"
+      style={{
+        borderTop: `1px solid ${t.border}`,
+        borderBottom: `1px solid ${t.border}`,
+        padding: "16px 0",
+        background: "rgba(255,255,255,0.015)",
+      }}
+    >
+      <div className="marquee-track">
+        <Strip />
+        <Strip />
+      </div>
     </div>
   );
 }

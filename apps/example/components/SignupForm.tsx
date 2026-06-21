@@ -302,6 +302,7 @@ export function SignupForm({ t, onSuccess, dense = false }: Props) {
           fontSize: dense ? 14 : 15,
           fontWeight: 600,
           letterSpacing: "0.01em",
+          boxShadow: "0 8px 30px rgba(124,92,255,0.40)",
           transition: "filter .15s, transform .08s",
         }}
       >
