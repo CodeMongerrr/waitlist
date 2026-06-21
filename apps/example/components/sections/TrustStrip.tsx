@@ -2,7 +2,7 @@ import type { Theme } from "@/lib/theme";
 import { SectionMark } from "./SectionMark";
 
 const HAIRLINE =
-  "linear-gradient(90deg, rgba(124,92,255,0) 0%, rgba(124,92,255,0.42) 16%, rgba(35,213,224,0.42) 50%, rgba(255,158,122,0.42) 84%, rgba(255,158,122,0) 100%)";
+  "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.16) 22%, rgba(255,255,255,0.16) 78%, rgba(255,255,255,0) 100%)";
 
 export function TrustStrip({ t }: { t: Theme }) {
   const mono: React.CSSProperties = {
@@ -20,7 +20,7 @@ export function TrustStrip({ t }: { t: Theme }) {
       statement: (
         <>
           Nothing posts{" "}
-          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.accentMint }}>
+          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.fg }}>
             without you
           </span>
         </>
@@ -35,7 +35,7 @@ export function TrustStrip({ t }: { t: Theme }) {
       statement: (
         <>
           It amplifies you,{" "}
-          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: "#C0A6FF" }}>
+          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.fg }}>
             never replaces you
           </span>
         </>
@@ -48,7 +48,7 @@ export function TrustStrip({ t }: { t: Theme }) {
       dot: t.accentCyan,
       statement: (
         <>
-          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.accentCyan }}>
+          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: t.fg }}>
             X only
           </span>
           , on purpose
@@ -107,14 +107,14 @@ export function TrustStrip({ t }: { t: Theme }) {
                   zIndex: 0,
                   pointerEvents: "none",
                   background:
-                    "radial-gradient(60% 100% at 14% 0%, rgba(91,233,185,0.12), transparent 60%)",
+                    "radial-gradient(60% 100% at 14% 0%, rgba(255,255,255,0.07), transparent 60%)",
                 }}
               />
             )}
             <div
               style={{
                 height: 1,
-                background: c.bright ? "rgba(91,233,185,0.5)" : HAIRLINE,
+                background: c.bright ? "rgba(255,255,255,0.4)" : HAIRLINE,
               }}
             />
             <div className="clause" style={{ position: "relative", zIndex: 1, padding: "clamp(28px,4.5vw,48px) 0" }}>

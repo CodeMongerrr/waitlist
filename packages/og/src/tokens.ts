@@ -2,20 +2,17 @@
 // (the renderer behind workers-og / next/og) has no access to CSS variables
 // or Tailwind. Override by passing your own template.
 //
-// Catalyst palette: dark, high-contrast, matches the landing theme.
-// `cream` = card background, `ink` = text, `red` = accent (keep this key name
-// even though the value is no longer red; swapping the brand color stays a
-// one-line change here).
+// Catalyst palette: minimal monochrome. `cream` = card background (near-black),
+// `ink` = text (near-white), `red` = the accent key (kept for one-line swaps;
+// here it is white to match the monochrome landing).
 
 export const OG_TOKENS = {
   width: 1200,
   height: 630,
-  cream: "#08090a",
-  ink: "#f3f4f6",
-  // Accent kept on a generic key (not literally "red"). Matches the landing's
-  // THEME.accent so social cards read consistent with the page.
-  red: "#6e62ff",
-  muted: "#8b8d98",
+  cream: "#0a0a0a",
+  ink: "#f4f4f5",
+  red: "#ffffff",
+  muted: "#8a8a90",
   line: "rgba(255,255,255,0.12)",
   monoStack:
     "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace",

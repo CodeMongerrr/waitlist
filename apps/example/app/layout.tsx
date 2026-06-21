@@ -1,41 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Bricolage_Grotesque,
-  Space_Grotesk,
-  IBM_Plex_Mono,
-  Instrument_Serif,
-} from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
 import { buildAllJsonLd } from "@waitlist-stack/seo";
 import config from "../waitlist.config";
 import "./globals.css";
 
-// Type system for the "Iridescent Spec Room" direction:
-// Bricolage Grotesque = oversized editorial display; Space Grotesk = body/UI;
-// IBM Plex Mono = the "markings" voice (indices, labels, chips, colophon);
-// Instrument Serif italic = reserved jewel for the phrase "in your voice".
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+// Minimal monochrome direction: one neutral heavy grotesque (Inter) carries
+// display + body; IBM Plex Mono is the labels/markings voice. No serif, no
+// decorative families — the look is precise and quiet, matching the product.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  display: "swap",
-});
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
   weight: ["400", "500"],
-  display: "swap",
-});
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -65,7 +46,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08090A",
+  themeColor: "#0a0a0a",
   colorScheme: "dark",
 };
 
@@ -74,10 +55,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const jsonLd = buildAllJsonLd(config);
   return (
-    <html
-      lang="en"
-      className={`${bricolage.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${instrumentSerif.variable}`}
-    >
+    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable}`}>
       <head>
         {jsonLd.map((block, i) => (
           <script

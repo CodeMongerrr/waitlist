@@ -1,30 +1,23 @@
 import type { Theme } from "@/lib/theme";
 
 export function Header({ t }: { t: Theme }) {
-  const mono: React.CSSProperties = {
-    fontFamily: t.monoFont,
-    fontSize: 11,
-    letterSpacing: "0.16em",
-    textTransform: "uppercase",
-  };
   return (
     <header
       style={{
         position: "sticky",
         top: 0,
         zIndex: 100,
-        background: "rgba(8,9,10,0.66)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        borderBottom: `1px solid ${t.border}`,
+        background: "rgba(10,10,10,0.6)",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
       }}
     >
       <div
         style={{
-          maxWidth: 1180,
+          maxWidth: 1200,
           margin: "0 auto",
-          height: 64,
-          padding: "0 clamp(20px,5vw,72px)",
+          height: 68,
+          padding: "0 clamp(20px,5vw,48px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -33,29 +26,32 @@ export function Header({ t }: { t: Theme }) {
       >
         <a
           href="#top"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            textDecoration: "none",
-          }}
+          style={{ display: "flex", alignItems: "center", gap: 11, textDecoration: "none" }}
         >
           <span
             style={{
-              width: 18,
-              height: 18,
-              borderRadius: 6,
-              background:
-                "linear-gradient(135deg,#7C5CFF,#23D5E0 55%,#FF9E7A)",
-              boxShadow: "0 0 18px rgba(124,92,255,0.5)",
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              background: t.fg,
+              color: t.bg,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: t.displayFont,
+              fontWeight: 800,
+              fontSize: 17,
+              lineHeight: 1,
             }}
-          />
+          >
+            c
+          </span>
           <span
             style={{
               fontFamily: t.displayFont,
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: 18,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.01em",
               color: t.fg,
             }}
           >
@@ -63,37 +59,17 @@ export function Header({ t }: { t: Theme }) {
           </span>
         </a>
 
-        <nav className="hide-sm" style={{ display: "flex", gap: 22 }}>
-          {[
-            { l: "how it works", h: "#how" },
-            { l: "control", h: "#control" },
-            { l: "join", h: "#join" },
-          ].map((x) => (
-            <a
-              key={x.h}
-              href={x.h}
-              style={{ ...mono, color: t.muted, textDecoration: "none" }}
-            >
-              [ {x.l} ]
-            </a>
-          ))}
-        </nav>
-
-        <a
-          href="#join"
+        <span
           style={{
-            ...mono,
+            fontFamily: t.monoFont,
             fontSize: 11,
-            color: t.fg,
-            textDecoration: "none",
-            padding: "8px 14px",
-            borderRadius: 999,
-            border: `1px solid ${t.borderStrong}`,
-            background: t.accentSoft,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: t.faint,
           }}
         >
-          Join the waitlist
-        </a>
+          Private beta
+        </span>
       </div>
     </header>
   );

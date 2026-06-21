@@ -5,7 +5,7 @@ import type { Theme } from "@/lib/theme";
 import type { Signup } from "@/lib/helpers";
 import { validateEmail } from "@/lib/helpers";
 
-type Tier = "starting" | "growing" | "established";
+type Tier = "" | "starting" | "growing" | "established";
 
 type Props = {
   t: Theme;
@@ -22,22 +22,15 @@ interface ApiResponse {
   error?: string;
 }
 
-const TIERS: { value: Tier; label: string; hint: string }[] = [
-  { value: "starting", label: "Starting out", hint: "< 1k" },
-  { value: "growing", label: "Growing", hint: "1k–10k" },
-  { value: "established", label: "Established", hint: "10k+" },
-];
-
 function refFromUrl(): string | undefined {
   if (typeof window === "undefined") return undefined;
   return new URLSearchParams(window.location.search).get("ref") ?? undefined;
 }
 
-export function SignupForm({ t, onSuccess, dense = false }: Props) {
+export function SignupForm({ t, onSuccess }: Props) {
   const [email, setEmail] = useState("");
-  // Optional. X handle and tier never block a signup.
   const [handle, setHandle] = useState("");
-  const [tier, setTier] = useState<Tier | null>(null);
+  const [tier, setTier] = useState<Tier>("");
   // Honeypot. Hidden from humans; bots that auto-fill all inputs trip it.
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [error, setError] = useState("");
@@ -67,7 +60,7 @@ export function SignupForm({ t, onSuccess, dense = false }: Props) {
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
           x_handle: handle.trim() || undefined,
-          tier: tier ?? undefined,
+          tier: tier || undefined,
           source: "landing",
           ref: refFromUrl(),
           website_url: websiteUrl,
@@ -79,8 +72,7 @@ export function SignupForm({ t, onSuccess, dense = false }: Props) {
         return;
       }
       const cleanHandle = handle.trim().replace(/^@+/, "");
-      const display =
-        cleanHandle || email.trim().toLowerCase().split("@")[0] || "you";
+      const display = cleanHandle || email.trim().toLowerCase().split("@")[0] || "you";
       onSuccess?.({
         name: display,
         email: email.trim().toLowerCase(),
@@ -99,127 +91,102 @@ export function SignupForm({ t, onSuccess, dense = false }: Props) {
     setSuggestion("");
   };
 
-  const fieldPad = dense ? "11px 13px" : "14px 15px";
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    padding: fieldPad,
+  const field: React.CSSProperties = {
+    padding: "13px 14px",
     fontFamily: t.uiFont,
-    fontSize: dense ? 14 : 15,
+    fontSize: 15,
     color: t.fg,
     background: t.inputBg,
     border: `1px solid ${touched && error ? t.danger : t.border}`,
     borderRadius: t.radius,
     outline: "none",
     transition: "border-color .15s, box-shadow .15s",
+    width: "100%",
+    minWidth: 0,
   };
 
   return (
-    <form
-      onSubmit={submit}
-      style={{ display: "flex", flexDirection: "column", gap: 10 }}
-    >
-      <input
-        className="wl-input"
-        name="email"
-        type="email"
-        inputMode="email"
-        autoComplete="email"
-        placeholder="you@email.com"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-          setSuggestion("");
-        }}
-        style={inputStyle}
-        disabled={submitting}
-      />
-
-      {/* Optional X handle with a leading @ affordance. */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          background: t.inputBg,
-          border: `1px solid ${t.border}`,
-          borderRadius: t.radius,
-          overflow: "hidden",
-        }}
-      >
-        <span
+    <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 8, textAlign: "left" }}>
+      {/* Row 1: email + submit */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <input
+          className="wl-input"
+          name="email"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          placeholder="you@email.com"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setSuggestion("");
+          }}
+          style={{ ...field, flex: "1 1 240px" }}
+          disabled={submitting}
+        />
+        <button
+          type="submit"
+          disabled={submitting}
           style={{
-            padding: `0 4px 0 14px`,
-            color: t.muted,
-            fontFamily: t.monoFont,
-            fontSize: dense ? 14 : 15,
+            flex: "1 1 150px",
+            padding: "13px 18px",
+            background: t.btnBg,
+            color: t.btnFg,
+            border: `1px solid ${t.btnBorder}`,
+            borderRadius: t.radius,
+            cursor: submitting ? "wait" : "pointer",
+            fontFamily: t.uiFont,
+            fontSize: 15,
+            fontWeight: 600,
+            letterSpacing: "0.01em",
+            transition: "filter .15s, transform .08s",
           }}
         >
-          @
-        </span>
+          {submitting ? "Reserving…" : t.ctaLabel}
+        </button>
+      </div>
+
+      {/* Row 2: optional handle + tier */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         <input
           className="wl-input"
           name="x_handle"
           type="text"
           autoComplete="off"
-          placeholder="yourhandle  ·  X handle (optional)"
+          placeholder="@yourhandle (optional)"
           value={handle}
-          onChange={(e) => setHandle(e.target.value.replace(/^@+/, ""))}
-          style={{
-            ...inputStyle,
-            border: "none",
-            borderRadius: 0,
-            padding: `${fieldPad.split(" ")[0]} 14px ${fieldPad.split(" ")[0]} 2px`,
-            background: "transparent",
-          }}
+          onChange={(e) => setHandle(e.target.value)}
+          style={{ ...field, flex: "1 1 180px" }}
           disabled={submitting}
         />
-      </div>
-
-      {/* Optional tier picker. */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-        <span
+        <select
+          className="wl-input"
+          name="tier"
+          value={tier}
+          onChange={(e) => setTier(e.target.value as Tier)}
+          disabled={submitting}
           style={{
-            fontFamily: t.monoFont,
-            fontSize: 10.5,
-            letterSpacing: "0.07em",
-            textTransform: "uppercase",
-            color: t.muted,
+            ...field,
+            flex: "1 1 180px",
+            color: tier ? t.fg : t.muted,
+            appearance: "none",
+            WebkitAppearance: "none",
+            cursor: "pointer",
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23999' stroke-width='1.4' fill='none'/%3E%3C/svg%3E\")",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "right 14px center",
+            paddingRight: 34,
           }}
         >
-          Where are you on X? (optional)
-        </span>
-        <div style={{ display: "flex", gap: 7 }}>
-          {TIERS.map((o) => {
-            const active = tier === o.value;
-            return (
-              <button
-                key={o.value}
-                type="button"
-                onClick={() => setTier(active ? null : o.value)}
-                disabled={submitting}
-                style={{
-                  flex: 1,
-                  padding: "9px 6px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 2,
-                  background: active ? t.accentSoft : "transparent",
-                  color: active ? t.fg : t.muted,
-                  border: `1px solid ${active ? t.accent : t.border}`,
-                  borderRadius: t.radius,
-                  cursor: "pointer",
-                  fontFamily: t.uiFont,
-                  transition: "all .12s",
-                }}
-              >
-                <span style={{ fontSize: 12.5, fontWeight: 600 }}>{o.label}</span>
-                <span style={{ fontSize: 10.5, color: t.muted }}>{o.hint}</span>
-              </button>
-            );
-          })}
-        </div>
+          <option value="" style={{ color: t.bg }}>Where are you on X? (optional)</option>
+          <option value="starting" style={{ color: t.bg }}>Starting out (&lt;1k)</option>
+          <option value="growing" style={{ color: t.bg }}>Growing (1k–10k)</option>
+          <option value="established" style={{ color: t.bg }}>Established (10k+)</option>
+        </select>
       </div>
 
+      {/* Honeypot */}
       <input
         name="website_url"
         type="text"
@@ -228,37 +195,16 @@ export function SignupForm({ t, onSuccess, dense = false }: Props) {
         aria-hidden="true"
         value={websiteUrl}
         onChange={(e) => setWebsiteUrl(e.target.value)}
-        style={{
-          position: "absolute",
-          left: "-9999px",
-          width: 1,
-          height: 1,
-          opacity: 0,
-        }}
+        style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
       />
 
       {suggestion && (
-        <div
-          style={{
-            fontSize: 12.5,
-            color: t.muted,
-            fontFamily: t.uiFont,
-            lineHeight: 1.4,
-          }}
-        >
+        <div style={{ fontSize: 12.5, color: t.muted, fontFamily: t.uiFont, lineHeight: 1.4 }}>
           Did you mean{" "}
           <button
             type="button"
             onClick={acceptSuggestion}
-            style={{
-              background: "none",
-              border: 0,
-              padding: 0,
-              cursor: "pointer",
-              color: t.accent,
-              textDecoration: "underline",
-              font: "inherit",
-            }}
+            style={{ background: "none", border: 0, padding: 0, cursor: "pointer", color: t.fg, textDecoration: "underline", font: "inherit" }}
           >
             {suggestion}
           </button>
@@ -266,16 +212,7 @@ export function SignupForm({ t, onSuccess, dense = false }: Props) {
           <button
             type="button"
             onClick={() => submit()}
-            style={{
-              background: "none",
-              border: 0,
-              padding: 0,
-              cursor: "pointer",
-              color: t.muted,
-              textDecoration: "underline",
-              font: "inherit",
-              marginLeft: 6,
-            }}
+            style={{ background: "none", border: 0, padding: 0, cursor: "pointer", color: t.muted, textDecoration: "underline", font: "inherit", marginLeft: 6 }}
           >
             no, send anyway
           </button>
@@ -283,42 +220,20 @@ export function SignupForm({ t, onSuccess, dense = false }: Props) {
       )}
 
       {error && (
-        <div style={{ fontSize: 12.5, color: t.danger, fontFamily: t.uiFont }}>
-          {error}
-        </div>
+        <div style={{ fontSize: 12.5, color: t.danger, fontFamily: t.uiFont }}>{error}</div>
       )}
-
-      <button
-        type="submit"
-        disabled={submitting}
-        style={{
-          padding: dense ? "12px 16px" : "15px 18px",
-          background: t.btnBg,
-          color: t.btnFg,
-          border: `1px solid ${t.btnBorder}`,
-          borderRadius: t.radius,
-          cursor: submitting ? "wait" : "pointer",
-          fontFamily: t.uiFont,
-          fontSize: dense ? 14 : 15,
-          fontWeight: 600,
-          letterSpacing: "0.01em",
-          boxShadow: "0 8px 30px rgba(124,92,255,0.40)",
-          transition: "filter .15s, transform .08s",
-        }}
-      >
-        {submitting ? "Reserving your spot…" : t.ctaLabel}
-      </button>
 
       <div
         style={{
+          fontFamily: t.monoFont,
           fontSize: 11.5,
-          color: t.muted,
-          fontFamily: t.uiFont,
-          lineHeight: 1.5,
+          letterSpacing: "0.04em",
+          color: t.faint,
+          textAlign: "center",
+          marginTop: 6,
         }}
       >
-        Nothing posts without your approval. Disposable emails blocked · rate
-        limited.
+        No card. No spam. Just early access.
       </div>
     </form>
   );

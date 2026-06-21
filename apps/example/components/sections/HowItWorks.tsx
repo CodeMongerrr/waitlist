@@ -29,7 +29,7 @@ export function HowItWorks({ t }: { t: Theme }) {
       title: (
         <>
           It writes{" "}
-          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: "#C0A6FF" }}>
+          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: "rgba(244,244,245,0.55)" }}>
             in your voice
           </span>
         </>
@@ -109,7 +109,7 @@ export function HowItWorks({ t }: { t: Theme }) {
                   zIndex: 0,
                   pointerEvents: "none",
                   background:
-                    "radial-gradient(70% 130% at 12% 50%, rgba(91,233,185,0.16), rgba(124,92,255,0.08) 42%, transparent 64%)",
+                    "radial-gradient(70% 130% at 12% 50%, rgba(255,255,255,0.14), rgba(255,255,255,0.05) 42%, transparent 64%)",
                   filter: "blur(14px)",
                 }}
               />
@@ -127,7 +127,7 @@ export function HowItWorks({ t }: { t: Theme }) {
                   lineHeight: 0.85,
                   display: "block",
                   ...(s.bright
-                    ? { WebkitTextStroke: `1px ${t.accentMint}`, color: "rgba(91,233,185,0.10)" }
+                    ? { WebkitTextStroke: `1px ${t.accentMint}`, color: "rgba(255,255,255,0.10)" }
                     : {}),
                 }}
               >
@@ -148,7 +148,7 @@ export function HowItWorks({ t }: { t: Theme }) {
                   width: 2,
                   overflow: "hidden",
                   background: `linear-gradient(180deg, ${s.color}, ${s.next})`,
-                  boxShadow: "0 0 12px rgba(124,92,255,0.22)",
+                  boxShadow: "0 0 12px rgba(255,255,255,0.18)",
                   opacity: 0.9,
                 }}
               >
@@ -179,7 +179,7 @@ export function HowItWorks({ t }: { t: Theme }) {
                   border: `1.5px solid ${s.color}`,
                   background: "#08090a",
                   boxShadow: s.bright
-                    ? `0 0 28px ${t.accentMint}, 0 0 60px rgba(91,233,185,0.5)`
+                    ? `0 0 28px ${t.accentMint}, 0 0 60px rgba(255,255,255,0.45)`
                     : `0 0 16px ${s.color}`,
                   display: "flex",
                   alignItems: "center",
@@ -259,7 +259,7 @@ function MiniDraft({ t }: { t: Theme }) {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <span style={{ width: 22, height: 22, borderRadius: 99, background: "linear-gradient(135deg,#7C5CFF,#23D5E0)" }} />
+        <span style={{ width: 22, height: 22, borderRadius: 99, background: "linear-gradient(135deg,#3a3a3c,#6e6e74)" }} />
         <span style={{ fontFamily: t.uiFont, fontSize: 12, fontWeight: 600, color: t.fg }}>You</span>
         <span style={{ fontFamily: t.monoFont, fontSize: 11, color: t.faint }}>@yourhandle</span>
       </div>

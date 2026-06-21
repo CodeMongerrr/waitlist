@@ -23,7 +23,7 @@ export function Footer({ t }: { t: Theme }) {
         style={{
           height: 1,
           background:
-            "linear-gradient(90deg, rgba(124,92,255,0) 0%, rgba(124,92,255,0.42) 16%, rgba(35,213,224,0.42) 50%, rgba(255,158,122,0.42) 84%, rgba(255,158,122,0) 100%)",
+            "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.16) 22%, rgba(255,255,255,0.16) 78%, rgba(255,255,255,0) 100%)",
         }}
       />
       {/* Ghosted brutalist watermark bleeding off the bottom. */}
@@ -64,19 +64,28 @@ export function Footer({ t }: { t: Theme }) {
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
             <span
               style={{
-                width: 18,
-                height: 18,
+                width: 22,
+                height: 22,
                 borderRadius: 6,
-                background: "linear-gradient(135deg,#7C5CFF,#23D5E0 55%,#FF9E7A)",
-                boxShadow: "0 0 18px rgba(124,92,255,0.5)",
+                background: t.fg,
+                color: t.bg,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily: t.displayFont,
+                fontWeight: 800,
+                fontSize: 14,
+                lineHeight: 1,
               }}
-            />
+            >
+              c
+            </span>
             <span
               style={{
                 fontFamily: t.displayFont,
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 20,
-                letterSpacing: "-0.02em",
+                letterSpacing: "-0.01em",
                 color: t.fg,
               }}
             >
@@ -143,8 +152,8 @@ export function Footer({ t }: { t: Theme }) {
               width: 6,
               height: 6,
               borderRadius: 99,
-              background: t.accentMint,
-              boxShadow: `0 0 10px ${t.accentMint}`,
+              background: t.live,
+              boxShadow: `0 0 10px ${t.live}`,
               animation: "dotPulse 2s infinite",
             }}
           />

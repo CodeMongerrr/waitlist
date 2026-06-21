@@ -44,7 +44,7 @@ export function SectionMark({
           height: 1,
           marginTop: 14,
           background:
-            "linear-gradient(90deg, rgba(124,92,255,0) 0%, rgba(124,92,255,0.42) 16%, rgba(35,213,224,0.42) 50%, rgba(255,158,122,0.42) 84%, rgba(255,158,122,0) 100%)",
+            "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.16) 22%, rgba(255,255,255,0.16) 78%, rgba(255,255,255,0) 100%)",
         }}
       >
         <span
