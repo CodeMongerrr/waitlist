@@ -1,0 +1,18 @@
+# Local dev secrets. Copy to `.dev.vars` (gitignored) and fill in.
+# Production values go in Cloudflare's secret store via `wrangler secret put`.
+
+# Resend API key. Sign up at https://resend.com (free tier 100/day, 3K/month).
+RESEND_API_KEY=re_your_key_here
+
+# Resend webhook signing secret. Get from your webhook config in the Resend
+# dashboard. Format: whsec_<base64>. Required for /api/resend-webhook.
+RESEND_WEBHOOK_SECRET=whsec_your_secret_here
+
+# Plain-text admin password. Compared with constant-time string compare; no
+# hashing because the surface area is one user (you). For multi-user setups,
+# replace with a real auth provider.
+ADMIN_PASSWORD=change-me-to-something-long
+
+# HMAC secret for signing admin session cookies. Generate with:
+#   openssl rand -base64 32
+ADMIN_COOKIE_SECRET=change-me-generate-with-openssl-rand

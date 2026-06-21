@@ -1,0 +1,40 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "version": "0.4.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "deploy": "opennextjs-cloudflare build && wrangler deploy",
+    "preview": "opennextjs-cloudflare build && wrangler dev",
+    "test-email": "node scripts/test-email.mjs"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "1.13.0",
+    "@waitlist-stack/admin": "^0.1.0",
+    "@waitlist-stack/config": "^0.1.0",
+    "@waitlist-stack/core": "^0.1.0",
+    "@waitlist-stack/db": "^0.1.0",
+    "@waitlist-stack/email": "^0.1.0",
+    "@waitlist-stack/og": "^0.1.0",
+    "@waitlist-stack/seo": "^0.1.0",
+    "next": "15.1.6",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "workers-og": "0.0.25"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20251121.0",
+    "@types/better-sqlite3": "7.6.12",
+    "@types/node": "22.10.7",
+    "@types/react": "19.0.7",
+    "@types/react-dom": "19.0.3",
+    "better-sqlite3": "11.7.0",
+    "typescript": "5.7.3",
+    "wrangler": "4.49.0"
+  }
+}

@@ -1,0 +1,43 @@
+// Cloudflare Workers config. Copy to wrangler.jsonc and fill in:
+//   1. account_id    — your Cloudflare account ID (`wrangler whoami`)
+//   2. d1 database_id — created via `wrangler d1 create waitlist`
+//   3. r2 bucket_name — created via `wrangler r2 bucket create waitlist-og`
+//
+// Routes section is optional. Without it the app deploys to a *.workers.dev
+// subdomain; with it, you bind to your own custom domain.
+
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "waitlist-stack-example",
+  "account_id": "REPLACE_WITH_YOUR_CLOUDFLARE_ACCOUNT_ID",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  "observability": { "enabled": true },
+  "workers_dev": true,
+
+  // Custom domain. Comment out until you have one configured in Cloudflare.
+  // "routes": [
+  //   { "pattern": "your-domain.com", "custom_domain": true },
+  //   { "pattern": "www.your-domain.com", "custom_domain": true }
+  // ],
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "waitlist",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+    }
+  ],
+
+  "r2_buckets": [
+    {
+      "binding": "OG_CACHE",
+      "bucket_name": "waitlist-og"
+    }
+  ]
+}

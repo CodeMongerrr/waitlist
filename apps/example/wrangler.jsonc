@@ -1,0 +1,41 @@
+// Cloudflare Workers config for the Catalyst waitlist.
+//
+// account_id and database_id are identifiers, not secrets, so this file is
+// safe to commit. Real secrets (ADMIN_PASSWORD, ADMIN_COOKIE_SECRET,
+// RESEND_API_KEY) are set with `wrangler secret put` and live in Cloudflare,
+// never in the repo.
+//
+// R2 is intentionally omitted: it isn't enabled on this account, and the OG
+// route falls back to an in-memory cache when there's no OG_CACHE binding.
+// To enable persistent OG caching later: enable R2 in the dashboard, run
+// `wrangler r2 bucket create catalyst-og`, and add an r2_buckets block here
+// with binding "OG_CACHE".
+
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "catalyst-waitlist",
+  "account_id": "264bbb028f853a776dc04dbcdc433296",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "migrations_dir": "migrations",
+
+  // Custom domain. Uncomment and fill once a domain is added in Cloudflare.
+  // "routes": [
+  //   { "pattern": "yourdomain.com", "custom_domain": true }
+  // ],
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "catalyst-waitlist",
+      "database_id": "90ab5e02-825c-4eab-ab96-c8e9886a53e6"
+    }
+  ]
+}

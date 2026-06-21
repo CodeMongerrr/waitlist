@@ -1,0 +1,40 @@
+{
+  "name": "@waitlist-stack/og",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Brand-tokenized OpenGraph cards rendered with workers-og and cached in R2 for the waitlist-stack template.",
+  "keywords": ["opengraph", "og-image", "cloudflare", "workers", "r2"],
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./template": "./src/template.tsx",
+    "./cache": "./src/cache.ts",
+    "./handler": "./src/handler.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@waitlist-stack/config": "workspace:*",
+    "@waitlist-stack/db": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20251121.0",
+    "@types/react": "19.0.7",
+    "react": "19.0.0",
+    "typescript": "5.7.3",
+    "vitest": "2.1.8"
+  }
+}

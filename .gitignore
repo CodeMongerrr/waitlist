@@ -1,0 +1,25 @@
+node_modules
+.next
+.turbo
+out
+dist
+.DS_Store
+*.log
+.env
+.env.local
+.env.*.local
+.dev.vars
+next-env.d.ts
+*.tsbuildinfo
+
+# Design source bundle (Stripe-Press-style mockup the landing was ported from).
+# Kept locally for reference; not part of the OSS template.
+_design-source/
+
+# Build / deploy artifacts
+.open-next
+.wrangler
+.vercel
+/coverage
+apps/*/.open-next
+apps/*/.wrangler

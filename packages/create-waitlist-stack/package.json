@@ -1,0 +1,25 @@
+{
+  "name": "create-waitlist-stack",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Scaffold a Cloudflare-native waitlist app in under 30 minutes.",
+  "type": "module",
+  "bin": {
+    "create-waitlist-stack": "./bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "templates"
+  ],
+  "scripts": {
+    "sync-template": "node scripts/sync-template.mjs",
+    "typecheck": "echo skip"
+  },
+  "dependencies": {
+    "@clack/prompts": "0.9.0",
+    "picocolors": "1.1.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@waitlist-stack/seo",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "JSON-LD, llms.txt, robots, sitemap, and dynamic favicon helpers for the waitlist-stack template.",
+  "keywords": ["seo", "json-ld", "llms-txt", "sitemap", "robots"],
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./json-ld": "./src/json-ld.ts",
+    "./llms-txt": "./src/llms-txt.ts",
+    "./robots": "./src/robots.ts",
+    "./sitemap": "./src/sitemap.ts",
+    "./favicon": "./src/favicon.tsx"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@waitlist-stack/config": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/react": "19.0.7",
+    "react": "19.0.0",
+    "typescript": "5.7.3",
+    "vitest": "2.1.8"
+  }
+}
