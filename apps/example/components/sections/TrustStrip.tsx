@@ -160,7 +160,7 @@ export function TrustStrip({ t }: { t: Theme }) {
         ))}
       </div>
 
-      {/* Signature line: honest anti-claims closed like an invoice total. */}
+      {/* Signature line: a single honest tag, centered below the clauses. */}
       <div
         style={{
           marginTop: 8,
@@ -170,18 +170,25 @@ export function TrustStrip({ t }: { t: Theme }) {
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "center",
-          gap: 14,
-          ...mono,
-          fontSize: 11,
-          color: t.muted,
+          gap: 12,
         }}
       >
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 7, color: t.faint }}>
-          <span style={{ width: 6, height: 6, borderRadius: 99, background: t.faint }} />
-          Spec
-        </span>
         {sigTokens.map((s) => (
-          <span key={s.t} style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
+          <span
+            key={s.t}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+              padding: "6px 12px",
+              borderRadius: 999,
+              border: `1px solid ${t.border}`,
+              background: "rgba(255,255,255,0.02)",
+              ...mono,
+              fontSize: 11,
+              color: t.muted,
+            }}
+          >
             <span
               style={{
                 width: 6,

@@ -176,17 +176,15 @@ Sticky, `top: 0`, z-index 100, translucent `rgba(10,10,10,0.6)` + 10px backdrop 
 
 Full-viewport, centered column, text-centered. Blueprint grid behind. Content `max-width: 1180px`. Elements stagger in from the bottom on load (delays in parentheses).
 
-1. **Status badge** (60ms): pill, `border` outline, mono 11.5px, `muted`. Green pulsing dot + text **"Now in private beta · v0.4"**. Margin-bottom 12px (tightened so the counter groups under it).
+1. **Status badge** (60ms): pill, `border` outline, mono 11.5px, `muted`, text **"Pre-launch · v0.4"** (no dot; the green dot now lives on the counter below). Margin-bottom 12px.
 2. **Live counter** (110ms): `LiveCount` (see 5.14), green pulsing dot + count or qualitative line. Margin-bottom `clamp(28px,4vw,44px)`.
-3. **H1** (160ms): Inter 800, `clamp(48px,11vw,132px)`, line 0.94, tracking -0.045em, `max-width: 1000px`, balanced wrap. Two A/B copies (switched by `?hero=`, default qualified):
-   - Qualified: **"Post `daily` on X, in a voice that's unmistakably yours."** (`.iris-text` on **daily**)
-   - Volume: **"Never `run out` of things to post on X."** (`.iris-text` on **run out**)
-4. **Subhead** (280ms): Inter, `clamp(16px,1.7vw,20px)`, line 1.6, `muted`, `max-width: 660px`. "in your voice" is italic, `fg`.
+3. **H1** (160ms): **"Grow on X `without` the full-time job."** Inter 800, `clamp(48px,11vw,132px)`, line 0.94, tracking -0.045em, `max-width: 1000px`, balanced wrap. `.iris-text` on **without**.
+4. **Subhead** (280ms): Inter, `clamp(16px,1.7vw,20px)`, line 1.6, `muted`, `max-width: 660px`. "in your voice" is italic, `fg`. The A/B test runs on the subhead (switched by `?hero=volume`, default qualified):
    - Qualified: "Catalyst reads Reddit, Hacker News, and Google News in your niche, drafts posts `in your voice` from what's actually happening, and queues them up. You spend about ten minutes a day approving the good ones. Every post still waits for your call."
    - Volume: "Catalyst turns what's happening in your niche into posts `in your voice`, ready to ship. You just pick the good ones."
 5. **Signup box** (400ms): `FloatingSignup`, `max-width: 560px`, margin-top `clamp(32px,4vw,52px)`. See 5.9.
 
-The A/B variant is read client-side from `?hero=volume` / `?hero=qualified` after mount (default qualified, so SSR and first paint match). It is a clearly commented block in `Hero.tsx`; delete it and keep one headline/subhead to retire the test.
+The A/B variant is read client-side from `?hero=volume` / `?hero=qualified` after mount (default qualified, so SSR and first paint match). It is a clearly commented block in `Hero.tsx`; the headline is fixed and only the subhead swaps. Delete the block and keep one subhead to retire the test.
 
 ### 5.3 How it works (`components/sections/HowItWorks.tsx`, `#how`)
 
@@ -207,8 +205,7 @@ The four stages (mono eyebrow `NN / Tag · annotation`, then display title, then
 
 **Step 03 is the emphasis step** ("bright"): white outlined numeral, larger pulsing white node, title with a left white border. Below it, a `max-width: 340px` column:
 - Mono line (white/`accentMint`, 10.5px): **"You approve every post · ~10 min/day"**
-- A **static example draft** (`StaticDraft`, defined in `HowItWorks.tsx`) with a faint mono caption **"A real draft Catalyst wrote for a devtools founder this week"**, so visitors who never click still see a draft. Same card chrome as the interactive one, no buttons.
-- The **interactive draft card** (see 5.11), the "try it yourself" follow-on.
+- The **interactive draft card** (see 5.11).
 
 > The boxy radial-gradient halo that used to sit behind step 03 has been removed; emphasis now comes from the node, numeral, and border only.
 
@@ -228,8 +225,7 @@ Standard section.
 | `02 · In your voice` | "It amplifies you, `never replaces you`" | "The point is to sound like you on a day you can't write, not like an AI tweet generator chasing numbers. If a draft doesn't sound like you, reject it, and it learns." |
 | `03 · Scoped on purpose` | "`One platform`, done right" | "One platform, done seriously. No LinkedIn cross-posting, no follower promises, no virality theater. Just consistent posts you'd put your name on." |
 
-- **Signature line** (centered, mono, dot-prefixed, separated, like an invoice total): `◆ Spec` rendered as a round `faint` dot + "Spec", then four tokens each with a colored dot:
-  **No auto-posting · No follower guarantees · Built for X · Human-approved**
+- **Signature line** (centered, below the clauses): a single bordered pill (mono, `border` outline, faint background) with a colored dot, **Built for X**.
 - **Audience line** (centered, Inter, `muted`, `max-width: 680px`):
   > "Built for solo founders, DevRel engineers, and technical creators in crypto, AI, and devtools. For people whose X account is pipeline, hiring, and reputation, not a hobby."
 - **Disclaimer** (centered, mono, `faint`, 10.5px): **"We never post without an explicit approval click · Not affiliated with X"**.
@@ -300,10 +296,9 @@ A live demo of the Approve step. Monochrome card (`rgba(0,0,0,0.28)`, `border`, 
 State and behavior:
 - Cycles through 4 sample drafts (`DRAFTS`).
 - **Approve** (white solid button): flashes an overlay "Approved · queued" with a `✓` in a mint ring, then `mdEnter`-animates the next draft in. Increments a session "approved" tally.
-- **Edit** (outline button): swaps the text for an editable textarea (mint border). Buttons become **Save** (commits, counts as approved/"Edited · queued") and **Cancel**.
-- **Skip** (outline button): flashes a muted "Skipped" with `×`, then advances.
+- **Reject** (outline button): flashes a muted "Rejected" with `×`, then advances (no tally increment).
 - Buttons (`.md-btn`) lift on hover (`translateY(-1px)`, slight brightness) and depress on click (`scale(0.96)`). Interactions are locked (`busy`) during the ~820ms flash.
-- Footer micro-status (mono, `faint`, 10px): "Try it · approve, edit, or skip" then "{n} approved here · go on, it's a demo".
+- Footer micro-status (mono, `faint`, 10px): "Try it · approve or reject" then "{n} approved here · go on, it's a demo".
 
 ### 5.12 SignupForm (`components/SignupForm.tsx`)
 
@@ -370,7 +365,7 @@ Client component for live social proof, rendered in the Hero (under the badge) a
 | Live signup counter (label, threshold) | `components/LiveCount.tsx` |
 | Signup count data | `app/api/waitlist/count/route.ts` |
 | FAQ questions | `components/sections/Faq.tsx` |
-| Steps + interactive card + static example draft | `components/sections/HowItWorks.tsx` |
+| Steps + interactive card | `components/sections/HowItWorks.tsx` |
 | Control clauses + spec tokens | `components/sections/TrustStrip.tsx` |
 | Marquee items | `components/CatalystLanding.tsx` (`Marquee`) |
 | Final CTA copy | `components/sections/Cta.tsx` |

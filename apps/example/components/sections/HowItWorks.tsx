@@ -294,13 +294,7 @@ export function HowItWorks({ t }: { t: Theme }) {
                   <div style={{ ...mono, fontSize: 10.5, color: t.accentMint, marginTop: 2 }}>
                     You approve every post · ~10 min/day
                   </div>
-                  <div style={{ maxWidth: 340, marginTop: 12, display: "flex", flexDirection: "column", gap: 16 }}>
-                    <div>
-                      <div style={{ ...mono, fontSize: 10, color: t.faint, marginBottom: 8 }}>
-                        A real draft Catalyst wrote for a devtools founder this week
-                      </div>
-                      <StaticDraft t={t} />
-                    </div>
+                  <div style={{ maxWidth: 340, marginTop: 12 }}>
                     <MiniDraft t={t} />
                   </div>
                 </>
@@ -315,33 +309,6 @@ export function HowItWorks({ t }: { t: Theme }) {
         ↺ The loop only moves when you say go
       </div>
     </section>
-  );
-}
-
-const EXAMPLE_DRAFT =
-  "watched a senior eng spend an hour fighting our setup script today. that hour is the most honest user research we've done all quarter. fixing it before we ship anything new.";
-
-// Static, always-visible sample so visitors who never click the interactive
-// card still see what a draft looks like. Same chrome as MiniDraft, no buttons.
-function StaticDraft({ t }: { t: Theme }) {
-  return (
-    <div
-      style={{
-        borderRadius: 12,
-        border: `1px solid ${t.border}`,
-        background: "rgba(0,0,0,0.28)",
-        padding: 12,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <span style={{ width: 22, height: 22, borderRadius: 99, background: "linear-gradient(135deg,#3a3a3c,#6e6e74)" }} />
-        <span style={{ fontFamily: t.uiFont, fontSize: 12, fontWeight: 600, color: t.fg }}>You</span>
-        <span style={{ fontFamily: t.monoFont, fontSize: 11, color: t.faint }}>@yourhandle</span>
-      </div>
-      <div style={{ fontFamily: t.uiFont, fontSize: 12.5, lineHeight: 1.5, color: t.fg }}>
-        {EXAMPLE_DRAFT}
-      </div>
-    </div>
   );
 }
 
