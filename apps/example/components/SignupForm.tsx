@@ -5,8 +5,6 @@ import type { Theme } from "@/lib/theme";
 import type { Signup } from "@/lib/helpers";
 import { validateEmail } from "@/lib/helpers";
 
-type Tier = "" | "starting" | "growing" | "established";
-
 type Props = {
   t: Theme;
   onSuccess?: (signup: Signup) => void;
@@ -30,7 +28,6 @@ function refFromUrl(): string | undefined {
 export function SignupForm({ t, onSuccess }: Props) {
   const [email, setEmail] = useState("");
   const [handle, setHandle] = useState("");
-  const [tier, setTier] = useState<Tier>("");
   // Honeypot. Hidden from humans; bots that auto-fill all inputs trip it.
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [error, setError] = useState("");
@@ -60,7 +57,6 @@ export function SignupForm({ t, onSuccess }: Props) {
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
           x_handle: handle.trim() || undefined,
-          tier: tier || undefined,
           source: "landing",
           ref: refFromUrl(),
           website_url: websiteUrl,
@@ -146,44 +142,46 @@ export function SignupForm({ t, onSuccess }: Props) {
         </button>
       </div>
 
-      {/* Row 2: optional handle + tier */}
+      {/* Row 2: optional handle. The "@" is fixed so users type only the name. */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <input
+        <div
           className="wl-input"
-          name="x_handle"
-          type="text"
-          autoComplete="off"
-          placeholder="@yourhandle (optional)"
-          value={handle}
-          onChange={(e) => setHandle(e.target.value)}
-          style={{ ...field, flex: "1 1 180px" }}
-          disabled={submitting}
-        />
-        <select
-          className="wl-input"
-          name="tier"
-          value={tier}
-          onChange={(e) => setTier(e.target.value as Tier)}
-          disabled={submitting}
-          style={{
-            ...field,
-            flex: "1 1 180px",
-            color: tier ? t.fg : t.muted,
-            appearance: "none",
-            WebkitAppearance: "none",
-            cursor: "pointer",
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23999' stroke-width='1.4' fill='none'/%3E%3C/svg%3E\")",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "right 14px center",
-            paddingRight: 34,
-          }}
+          style={{ ...field, flex: "1 1 100%", padding: 0, display: "flex", alignItems: "center" }}
         >
-          <option value="" style={{ color: t.bg }}>Where are you on X? (optional)</option>
-          <option value="starting" style={{ color: t.bg }}>Starting out (&lt;1k)</option>
-          <option value="growing" style={{ color: t.bg }}>Growing (1k–10k)</option>
-          <option value="established" style={{ color: t.bg }}>Established (10k+)</option>
-        </select>
+          <span
+            style={{
+              padding: "13px 4px 13px 14px",
+              fontFamily: t.uiFont,
+              fontSize: 15,
+              color: t.muted,
+              userSelect: "none",
+            }}
+            aria-hidden="true"
+          >
+            @
+          </span>
+          <input
+            name="x_handle"
+            type="text"
+            autoComplete="off"
+            placeholder="yourhandle (optional)"
+            aria-label="Your X handle"
+            value={handle}
+            onChange={(e) => setHandle(e.target.value.replace(/^@+/, ""))}
+            style={{
+              flex: 1,
+              minWidth: 0,
+              padding: "13px 14px 13px 0",
+              border: "none",
+              outline: "none",
+              background: "transparent",
+              fontFamily: t.uiFont,
+              fontSize: 15,
+              color: t.fg,
+            }}
+            disabled={submitting}
+          />
+        </div>
       </div>
 
       {/* Honeypot */}

@@ -5,8 +5,8 @@ import type { Signup } from "@/lib/helpers";
 import { SignupForm } from "./SignupForm";
 import { ReferralCard } from "./ReferralCard";
 
-// Wraps the signup flow in a 3D-floating glass box. Email is required; handle
-// and "where are you on X" stay optional inside SignupForm. After success the
+// Wraps the signup flow in a 3D-floating glass box. Email is required; the X
+// handle stays optional inside SignupForm. After success the
 // ReferralCard replaces the form in the same floating box, so the card never
 // jumps. Styling lives in globals.css (.float-scene / .float-bob / .float-card)
 // and uses only existing monochrome tokens.
