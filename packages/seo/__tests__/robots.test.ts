@@ -18,6 +18,12 @@ describe("buildRobots", () => {
     expect(r.rules[0].disallow).toContain("/api/");
   });
 
+  it("allows /api/og so crawlers can fetch the OG share image", () => {
+    const r = buildRobots(config());
+    expect(r.rules[0].allow).toContain("/api/og");
+    expect(r.rules[0].disallow).toContain("/api/");
+  });
+
   it("allows admin when allowAdmin opt is true", () => {
     const r = buildRobots(config(), { allowAdmin: true });
     expect(r.rules[0].disallow).not.toContain("/admin");
@@ -42,6 +48,7 @@ describe("toRobotsTxt", () => {
     const txt = toRobotsTxt(buildRobots(config()));
     expect(txt).toContain("User-agent: *");
     expect(txt).toContain("Allow: /");
+    expect(txt).toContain("Allow: /api/og");
     expect(txt).toContain("Disallow: /admin");
     expect(txt).toContain("Sitemap: https://q.example/sitemap.xml");
   });
