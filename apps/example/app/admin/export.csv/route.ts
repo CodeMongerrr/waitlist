@@ -41,15 +41,20 @@ const COLUMNS: (keyof Row)[] = [
 function csvEscape(v: unknown): string {
   if (v === null || v === undefined) return "";
   let s = String(v);
-  // CSV / formula injection guard. If a cell opens with =, +, -, @, tab, or
-  // CR, Excel and most spreadsheet apps will execute it as a formula on open
+  // CSV / formula injection guard. If a cell opens with =, +, -, @, tab, CR, or
+  // LF, Excel and most spreadsheet apps will execute it as a formula on open
   // (e.g. =cmd|'/c calc'!A1). Prefix with a single quote to neutralize. The
   // quote is hidden in Excel's display and visible in plain-text readers,
   // which is the right tradeoff for an export of arbitrary user input.
-  if (s.length > 0 && /^[=+\-@\t\r]/.test(s)) {
+  if (s.length > 0 && /^[=+\-@\t\r\n]/.test(s)) {
     s = `'${s}`;
   }
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  // RFC 4180: a field containing a quote, comma, CR, or LF must be wrapped in
+  // double quotes (inner quotes doubled). CR matters as much as LF: a bare CR
+  // is a record break to spreadsheet importers, so an unquoted cell splits on
+  // it and the text after the break becomes a new, unguarded cell that can
+  // re-open the formula hole above.
+  if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }
 

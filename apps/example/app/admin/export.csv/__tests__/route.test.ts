@@ -192,6 +192,27 @@ describe("GET /admin/export.csv", () => {
     expect(lines[3].split(",")[1]).toBe("'@formula");
   });
 
+  it("quotes a cell with an embedded carriage return so a bare CR can't split the row", async () => {
+    // A bare CR is a record break to spreadsheet importers. Unquoted, the text
+    // after it becomes a new cell that re-opens formula injection past the
+    // leading-char guard (name = "x<CR>=cmd|..."). Quoting keeps the CR inside
+    // the field so no importer treats it as a row boundary.
+    const CR = String.fromCharCode(0x0d);
+    rowsToReturn = [
+      row({ id: 9, name: `x${CR}=cmd|'/c calc'!A1`, email: "x@example.com" }),
+    ];
+    const { GET } = await import("../route");
+
+    const res = await GET(req());
+    const body = await res.text();
+    const dataLine = body.split("\n")[1];
+
+    // The full name cell is double-quote wrapped; the CR lives inside the quotes.
+    expect(dataLine).toContain(`"x${CR}=cmd|'/c calc'!A1"`);
+    // The formula fragment must never sit at an unquoted cell boundary.
+    expect(body.includes(`,x${CR}=`)).toBe(false);
+  });
+
   it("CSV-quotes ordinary cells that contain commas, quotes, or newlines", async () => {
     rowsToReturn = [
       row({ id: 1, name: 'Doe, "Jane"', email: "jane@example.com" }),
