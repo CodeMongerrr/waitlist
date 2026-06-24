@@ -3,6 +3,7 @@ import type { WaitlistDb, WaitlistRow } from "@waitlist-stack/db";
 import { isValidEmail } from "./email-check";
 import { generateReferralCode, isValidReferralCode } from "./referrals";
 import { checkRateLimit } from "./rate-limit";
+import { sanitizeText } from "./sanitize";
 
 const REFERRAL_CODE_RETRIES = 5;
 
@@ -67,7 +68,7 @@ export async function signup(
     return { ok: true, duplicate: true, referralCode: null, position: null, referralCount: 0 };
   }
 
-  const name = input.name.trim();
+  const name = sanitizeText(input.name).trim();
   const email = input.email.trim().toLowerCase();
 
   if (name.length < 2 || name.length > 80) {
@@ -99,7 +100,7 @@ export async function signup(
 
   const source =
     typeof input.source === "string" && input.source.length <= 32
-      ? input.source
+      ? sanitizeText(input.source)
       : "unknown";
 
   // Generate a unique referral_code. Unique index rejects collisions; retry
@@ -117,7 +118,7 @@ export async function signup(
         user_agent: input.userAgent ?? null,
         referral_code: code,
         referred_by: referredBy,
-        x_handle: input.x_handle ?? null,
+        x_handle: input.x_handle != null ? sanitizeText(input.x_handle) : null,
         tier: input.tier ?? null,
       });
     } catch (err) {

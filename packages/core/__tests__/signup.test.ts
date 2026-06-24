@@ -113,4 +113,26 @@ describe("signup", () => {
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error).toBe("rate_limited");
   });
+
+  it("strips control characters from stored name, source, and x_handle", async () => {
+    // Defense in depth for the CSV export: a bare CR smuggled into a free-text
+    // field would otherwise split a spreadsheet cell and re-open formula
+    // injection. Core is the authoritative input boundary, so nothing dirty is
+    // persisted regardless of which app calls signup().
+    const CR = String.fromCharCode(0x0d);
+    const LF = String.fromCharCode(0x0a);
+    const r = await signup(db, makeConfig(), {
+      name: `Ada${CR}=cmd`,
+      email: "ada@x.com",
+      ip: "1.1.1.1",
+      source: `ref${CR}erral`,
+      x_handle: `ada${LF}lovelace`,
+    });
+    expect(r.ok && !r.duplicate).toBe(true);
+
+    const stored = await db.findByEmail("ada@x.com");
+    expect(stored?.name).toBe("Ada=cmd");
+    expect(stored?.source).toBe("referral");
+    expect(stored?.x_handle).toBe("adalovelace");
+  });
 });
