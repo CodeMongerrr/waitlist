@@ -24,11 +24,16 @@ export interface AppEnv {
 
 export async function env(): Promise<AppEnv> {
   let cf: Partial<AppEnv> | null = null;
-  try {
-    const ctx = await getCloudflareContext({ async: true });
-    cf = ctx.env as unknown as Partial<AppEnv>;
-  } catch {
-    // No Cloudflare runtime; fall through to dev fallback.
+  // WAITLIST_FORCE_DEV_DB forces the in-memory dev DB (fresh, migrations
+  // auto-applied) for e2e/CI, bypassing any local miniflare D1. Production
+  // never sets it.
+  if (process.env.WAITLIST_FORCE_DEV_DB !== "1") {
+    try {
+      const ctx = await getCloudflareContext({ async: true });
+      cf = ctx.env as unknown as Partial<AppEnv>;
+    } catch {
+      // No Cloudflare runtime; fall through to dev fallback.
+    }
   }
   if (!cf || !cf.DB) {
     const { getDevD1 } = await import("./dev-db");

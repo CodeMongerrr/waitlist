@@ -4,7 +4,12 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+
+# Cancel superseded runs on the same ref so a fresh push doesn't queue behind
+# stale work.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check:
@@ -25,15 +30,69 @@ jobs:
           cache: pnpm
 
       - name: Install
-        # better-sqlite3 has a native binary that builds during install.
-        # The repo's pnpm.onlyBuiltDependencies allowlist permits it.
+        # better-sqlite3 has a native binary that builds during install; it
+        # powers both the in-memory test DB and the dev/e2e fallback.
         run: pnpm install --frozen-lockfile
 
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Test
+      - name: Unit tests (packages + app)
         run: pnpm test
+
+      - name: App unit coverage
+        run: pnpm --filter @waitlist-stack/example test:coverage
+
+      - name: Upload unit coverage
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-coverage
+          path: apps/example/coverage/unit
+          retention-days: 7
 
       - name: Build
         run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm --filter @waitlist-stack/example exec playwright install --with-deps chromium
+
+      # Playwright's webServer runs `next build && next start`; with no D1
+      # binding the app uses the in-memory dev DB, so the signup flow works
+      # end-to-end with no database setup.
+      - name: E2E tests (Playwright)
+        run: pnpm --filter @waitlist-stack/example test:e2e
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: |
+            apps/example/coverage/e2e
+            apps/example/playwright-report
+          retention-days: 7

@@ -23,9 +23,9 @@ export function Hero({
         className="pointer-events-none absolute left-1/2 top-0 z-0 h-[620px] w-[820px] max-w-[120vw] -translate-x-1/2 bg-[radial-gradient(50%_50%_at_50%_30%,rgba(255,255,255,0.07),transparent_72%)]"
       />
 
-      <div className="relative z-[1] mx-auto flex w-full max-w-[1180px] flex-1 flex-col items-center justify-start px-5 pb-16 pt-12 text-center sm:justify-center sm:px-8 sm:py-24 lg:px-[72px]">
+      <div className="relative z-[1] mx-auto flex w-full max-w-[1180px] flex-1 flex-col items-center justify-start px-5 pb-16 pt-4 text-center sm:justify-center sm:px-8 sm:py-24 lg:px-[72px]">
         {/* One status row: stage + live proof on a single line with one green dot. */}
-        <div className="reveal mb-7 sm:mb-9" style={{ animationDelay: "80ms" }}>
+        <div className="reveal mb-4 sm:mb-9" style={{ animationDelay: "80ms" }}>
           <LiveCount label="Private beta" />
         </div>
 
@@ -58,7 +58,7 @@ export function Hero({
         </p>
 
         <div
-          className="reveal mt-8 w-full max-w-[560px] sm:mt-12"
+          className="reveal mt-6 w-full max-w-[560px] sm:mt-12"
           style={{ animationDelay: "400ms" }}
         >
           <FloatingSignup signup={signup} setSignup={setSignup} />

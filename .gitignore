@@ -23,3 +23,11 @@ _design-source/
 /coverage
 apps/*/.open-next
 apps/*/.wrangler
+
+# Test artifacts (vitest coverage, Playwright report + traces)
+coverage
+test-results
+playwright-report
+apps/*/coverage
+apps/*/test-results
+apps/*/playwright-report
