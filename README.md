@@ -1,173 +1,106 @@
-# waitlist-stack
+# Catalyst
 
-[![CI](https://github.com/Giri-Aayush/waitlist-stack/actions/workflows/ci.yml/badge.svg)](https://github.com/Giri-Aayush/waitlist-stack/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE)
+[![CI](https://github.com/CodeMongerrr/waitlist/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeMongerrr/waitlist/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE)
 
-A complete, MIT-licensed waitlist template for Cloudflare. Signup, referrals, transactional email, edge-cached OG images, password-gated admin, SEO + llms.txt, anti-fraud. Deploy in under 30 minutes for $0.
+**Post daily on X, in a voice that's unmistakably yours.**
 
-![Landing hero](docs/screenshots/landing-hero.png)
+Catalyst reads Reddit, Hacker News, and Google News in your niche, drafts posts in your voice from what's actually happening, and queues them. You approve the good ones in about ten minutes a day. Every post waits for your approval.
 
-```sh
-npm create waitlist-stack@latest my-waitlist
-```
+This repo is the **Catalyst waitlist site**: the signup landing, the referral loop, transactional welcome email, personalized OG share cards, and a password-gated admin dashboard. It runs entirely on Cloudflare's free tier.
 
-That's it. The wizard prompts for your brand, founder details, and Cloudflare account, writes a fully populated project, and prints the four commands to deploy.
+**Live:** https://catalyst-waitlist.aayushgiri1234.workers.dev
 
-> **Pre-release note (remove once `@waitlist-stack/*` packages are published to npm):** the wizard's scaffolded project depends on `@waitlist-stack/{db,config,core,email,og,seo,admin}` from npm. Until those are published, the scaffolded project's `npm install` will fail to resolve them. To try the template in the meantime, clone this repo and `cd apps/example && pnpm install && pnpm dev`.
+![Catalyst landing](docs/screenshots/landing-hero.png)
 
-## Have an AI agent walk you through this
+## What it does
 
-If terminal commands aren't your thing, copy the prompt below into Claude, ChatGPT, Cursor, or any agent that can fetch URLs. It will read this README, the setup docs, and the relevant code, then guide you step-by-step from a clean machine to a live deployment with your brand on it.
+- **Email-first signup, hard to abuse.** Drop an email, you're on the list. A honeypot catches auto-fill bots, disposable-email domains (mailinator, 10minutemail, etc.) are blocked, one IP can't spam the form, and obvious typos get a polite "did you mean `gmail.com`?".
+- **Referrals that move the line.** Every signup gets a link like `catalyst-waitlist.aayushgiri1234.workers.dev/?ref=K7M9P3`. Each friend who joins through it moves you up **5 spots**, and the position you see updates live as they join.
+- **OG cards with your name and rank.** Share your link to X, Slack, iMessage, or LinkedIn and the preview reads *"<name> just joined the Catalyst waitlist · #1247"* instead of a generic logo.
+- **Admin dashboard you can log into.** Password-gated list of every signup: filter by email status, search by name or email, retry any failed welcome email, export the list to CSV.
+- **Welcome email via Resend.** Sent right after signup. If Resend rate-limits the free tier, the row is marked `failed` and you batch-retry later from the admin instead of burning attempts during the 429.
+- **SEO and answer-engine discoverability.** JSON-LD, sitemap, robots, a dynamic favicon, and an auto-generated `llms.txt` so Perplexity, ChatGPT, and Claude quote Catalyst correctly.
 
-```
-I want to deploy waitlist-stack, a free, MIT-licensed waitlist template
-that runs on Cloudflare's free tier:
-https://github.com/Giri-Aayush/waitlist-stack
+![Admin dashboard](docs/screenshots/landing-admin.png)
 
-Treat me as a non-expert solo founder. Walk me through, pausing and
-confirming with me between each step:
-
-1. What this gives me out of the box, in plain English (what does
-   "signup form + referrals + email + OG images + admin dashboard"
-   actually mean for my product?).
-2. The accounts I need to sign up for before I can deploy
-   (Cloudflare, Resend, GitHub) and roughly how much time each takes.
-3. The exact commands to run, in order, from `npm create
-   waitlist-stack` through `npm run deploy`.
-4. How to customize the design once it's running: what files to edit,
-   what to ask Claude Code to do for me, where the brand colors live.
-5. Common errors I'll hit and how to fix them (Resend domain
-   verification, wrangler login, D1 migration order).
-
-Use the README at
-https://raw.githubusercontent.com/Giri-Aayush/waitlist-stack/main/README.md
-as the source of truth. If you need more depth on a topic, fetch the
-relevant file from the repo (CONTRIBUTING.md, the RESEND_SETUP.md
-inside apps/example/, per-package code).
-
-When we're done, I should have a live waitlist on Cloudflare with my
-brand, accepting signups, and sending welcome emails.
-```
-
-## Why this exists
-
-Every solo founder validating an idea rebuilds the same stack from scratch. Signup form, referral math, transactional email, OG image generation, an admin to look at signups. It takes a week. It costs $20-50/month from day one (Vercel + Postgres + S3 + a transactional email service). It's the time-and-money tax on idea validation.
-
-This template removes both. The full stack runs on Cloudflare's free tier:
-
-- **Database**: D1 (SQLite, 5 GB / 5M reads per day)
-- **Object storage**: R2 (10 GB / 1M class A ops per month, used for OG image cache)
-- **Compute**: Workers (100K req/day) via `@opennextjs/cloudflare`
-- **Email**: Resend (100/day, 3K/month) — the one non-Cloudflare dep, kept because there's no good Cloudflare-native transactional email yet
-
-The free tiers comfortably cover ~3K signups per month. Enough to validate any product before any real revenue exists.
-
-## What you get
-
-Eight subsystems, each in its own package, each independently forkable:
-
-| Package | What it does |
-|---|---|
-| [`packages/db`](packages/db/) | D1 schema (5 migrations), typed client, in-memory test harness |
-| [`packages/config`](packages/config/) | Plain TS product config schema (`defineConfig` helper) |
-| [`packages/core`](packages/core/) | Signup orchestration, Crockford base32 referral codes, position math (window function), Levenshtein typo suggestion + 100-entry disposable email blocklist, sliding-window rate limit |
-| [`packages/email`](packages/email/) | Resend adapter (Postmark + SendGrid stubs alongside), parameterized templates, Svix webhook verification |
-| [`packages/og`](packages/og/) | Brand-tokenized OG cards, R2 cache keyed by referral state, renderer-agnostic handler |
-| [`packages/seo`](packages/seo/) | JSON-LD blocks (Organization, WebSite, SoftwareApplication), llms.txt generator, robots, sitemap, dynamic favicon |
-| [`packages/admin`](packages/admin/) | Signed-cookie auth (Web Crypto), DB-backed session-version revoke, login rate limit, middleware |
-| [`packages/create-waitlist-stack`](packages/create-waitlist-stack/) | The CLI wizard |
-
-Plus [`apps/example`](apps/example/) — a deploy-ready Next.js 15 app wired to all the packages, with a polished landing the wizard scaffolds from.
-
-![Subsystems section](docs/screenshots/landing-subsystems.png)
-
-## Quickstart
+## Run locally
 
 ```sh
-npm create waitlist-stack@latest my-waitlist
-cd my-waitlist
-npm install
-npm run dev    # http://localhost:3000
+pnpm install
+pnpm dev        # Catalyst landing at http://localhost:3000
 ```
 
-To deploy:
+No Cloudflare setup is needed for local dev. An in-memory SQLite stand-in backs signups, OG, and admin, so the whole flow (signup, referral, admin) works offline with zero config. The admin login in dev uses `ADMIN_PASSWORD` (a dev default is supplied).
+
+```sh
+pnpm test       # unit + component tests across the packages and app
+pnpm typecheck  # tsc --noEmit, every package
+```
+
+## Deploy
+
+Catalyst ships to Cloudflare Workers through [`@opennextjs/cloudflare`](https://github.com/opennextjs/opennextjs-cloudflare). The Worker name, account, and D1 binding are pinned in [`apps/example/wrangler.jsonc`](apps/example/wrangler.jsonc); secrets live in Cloudflare, never in the repo.
 
 ```sh
 npx wrangler login
-npx wrangler d1 create my-waitlist            # paste the id into wrangler.jsonc
-npx wrangler r2 bucket create my-waitlist-og
-npx wrangler d1 migrations apply my-waitlist --remote
-npm run deploy
+
+# First time only: apply the schema (6 migrations in packages/db/migrations)
+# to the remote D1 database named catalyst-waitlist.
+
+# Build (OpenNext) and ship:
+pnpm --filter example deploy
 ```
 
-The wizard generates a `CLAUDE.md` in your scaffolded project that briefs Claude Code on where everything lives. To customize the design: open the project in Claude Code and ask. The theme tokens are in `lib/theme.ts`; the landing composition is in `components/PaperLanding.tsx`.
+Set these as Worker secrets (`wrangler secret put <NAME>` or the Cloudflare dashboard):
+
+| Secret | Purpose |
+|---|---|
+| `RESEND_API_KEY` | sends the welcome email |
+| `RESEND_WEBHOOK_SECRET` | verifies Resend delivery/bounce webhooks (Svix) |
+| `ADMIN_PASSWORD` | admin login (must be >= 12 chars) |
+| `ADMIN_COOKIE_SECRET` | signs admin session cookies (must be >= 12 chars) |
+
+OG caching is in-memory by default (R2 is not provisioned on this account); cards still render on every request. To persist them, enable R2, create a bucket, and add an `OG_CACHE` binding to `wrangler.jsonc`.
 
 ## How it works
 
-Each feature has a one-line plain-English summary plus an *under the hood* note for the curious.
+Each line is the plain-English behavior plus an *under the hood* note.
 
-**Signup form that's hard to abuse.** Drop name + email, hit submit, you're on the list. The form catches honeypot bots, blocks disposable email services (mailinator, 10minutemail, etc.), rate-limits one IP from spamming you, and politely suggests typo fixes ("did you mean `gmail.com`?").
-> Under the hood: `POST /api/waitlist` runs validation, honeypot check, per-IP sliding-window rate limit, referral resolution with self-referral block, insert with unique-code retry, then a position lookup. Welcome email fires in best-effort mode; failures land in `email_status='failed'` for the admin retry batch.
+**Signup.** Email in, position out. Honeypot, per-IP rate limit, disposable-email block, typo suggestion, self-referral block.
+> `POST /api/waitlist` runs validation, the `website_url` honeypot check, a per-IP sliding-window rate limit, referral resolution, and an insert with unique-code retry, then a position lookup. The welcome email fires best-effort; failures land in `email_status='failed'` for the admin retry batch. User-supplied text (name, source, X handle) is stripped of control characters at the core boundary before it is stored.
 
-**Referrals that actually work.** Every signup gets a unique link like `your-site.com/?ref=K7M9P3`. When someone signs up through that link, the original person jumps 10 spots in the queue. The position they see updates live as their friends join.
-> Under the hood: position is recomputed from the full table via a SQLite window function (rank by `created_at`, subtract `referral_count * jumpsPerReferral`, tiebreak by id), so other people's referrals correctly shift you down.
+**Referrals.** A friend joining via `?ref=CODE` moves the referrer up 5 spots, live.
+> Position is recomputed from the whole table with a SQLite window function (rank by `created_at`, subtract `referral_count * 5`, tiebreak by id), so other people's referrals correctly shift you down. `GET /api/waitlist/me/{code}` returns live `{position, baseRank, referralCount}` for a code. A code reveals position only, not name or email, and codes are 6-char Crockford base32 (~10⁹ keyspace), so enumeration isn't economic.
 
-**OG cards that show the user's name + position.** When someone shares their referral link to Twitter, Slack, iMessage, or LinkedIn, the preview shows *"Mira just got on the Acme waitlist · #1247"* instead of a generic logo. Way more clickable.
-> Under the hood: `/api/og?ref=CODE` returns a personalized 1200×630 PNG. Cached in R2 keyed by `<code>:<position>:<referralCount>` so a referral bump invalidates the image automatically. Generic fallback (no DB lookup) for missing or invalid refs as a denial-of-cost defense.
+**OG cards.** Personalized 1200×630 PNG per referral code.
+> `GET /api/og?ref=CODE` renders with workers-og (Satori + Yoga + Resvg). Cached by `<code>:<position>:<referralCount>` so a referral bump invalidates the image. Generic fallback (no DB lookup) for missing or invalid refs as a denial-of-cost defense.
 
-**Admin dashboard you can actually log into.** Password-gated page that lists every signup. Filter by status (delivered / bounced / failed / queued), search by name or email, retry any failed welcome email with one click, export the whole list to CSV.
+**Admin.** Signed-cookie auth, three-tier verification.
+> `/admin` is gated by HMAC-SHA256 signed cookies over `<issuedMs>.<sessionVersion>`: a cheap edge check in middleware, a full DB-backed version check inside every page, and the same `requireAdminOrRedirect()` guard on every server action, so a route-matcher misconfig can't leak data. Bumping the DB session-version row revokes every active cookie at once.
 
-![Admin dashboard preview](docs/screenshots/landing-admin.png)
-
-> Under the hood: `/admin` is gated by signed cookies (HMAC-SHA256 over `<issuedMs>.<sessionVersion>`). Three-tier verification: cheap edge HMAC check in middleware, full DB-backed version check inside every page, and the same `requireAdminOrRedirect()` guard runs on every server action — a route matcher misconfig can't leak data. Bumping the DB session-version row invalidates every active cookie at once (the logout flow). Dashboard surface: search box, status filter chips with a synthetic `queued` = pending+failed combo, color-coded statuses with attempt counts, inline error tooltips, per-row retry button, batch retry that surfaces *"X/Y sent · errors · hit provider rate limit"*, CSV export respecting current filter + search.
-
-**Transactional email that survives provider hiccups.** Welcome emails go out via Resend right after signup. If Resend rate-limits you (free tier is 100/day), the row is marked `failed` and you can batch-retry later from the admin — without burning more attempts during the 429.
-> Under the hood: Resend webhook (Svix-signed) flips rows to `delivered` / `bounced` / `failed`. Batch retry pulls the latest 100 pending/failed, re-looks-up each row's current position so retried emails reflect the live queue, short-circuits the loop on a 429 from Resend.
-
-**Live "you're #N" updates without an account.** After someone signs up, their position updates in real time as friends join — no login required, no polling your DB inefficiently.
-> Under the hood: `GET /api/waitlist/me/{code}` returns the live `{position, baseRank, referralCount}` for a referral code. Knowing a code reveals position only — not name or email — and codes are 6-char Crockford base32 (~10⁹ keyspace), so brute enumeration isn't economic against a small list.
-
-**CSV export with everything.** One click in the admin. Includes name, email, source, status, attempts, last error, referral code + count, timestamps. Filter-aware (export only the bounces, only the queued, etc.).
-> Under the hood: `GET /admin/export.csv?q=&status=` is auth-gated (returns 401 not a redirect, so download clients fail loudly). RFC 4180-quoted, plus a leading-quote guard against formula injection — a name like `=cmd|...` is neutralized before Excel can execute it.
-
-**SEO + answer-engine discoverability.** JSON-LD blocks (Organization, WebSite, SoftwareApplication with priced offers) so Google's rich results work. Auto-generated `llms.txt` so Perplexity, ChatGPT, and Claude can quote your brand correctly when users ask about you.
-> Under the hood: all driven from `waitlist.config.ts`. robots, sitemap, favicon, OG meta, Twitter card all read the same brand object.
-
----
-
-**Tested.** 124 unit tests across the six backend packages cover the load-bearing correctness: position math (including the regression where other people's referrals must shift you down), referral code generation, email validation + Levenshtein typo suggestion, signup orchestration with the wired-through honeypot, Svix webhook signature verification (tampered body / wrong secret / multi-signature) plus replay-window rejection, webhook event routing, signed-cookie roundtrip with version revoke, login rate-limit window logic, JSON-LD founder-name passthrough.
+**Email.** Resend send, webhook-driven status, batch retry.
+> A Svix-signed Resend webhook flips rows to `delivered` / `bounced` / `failed`. Batch retry pulls the latest 100 pending/failed, re-looks-up each row's current position so retries reflect the live queue, and short-circuits on a 429.
 
 ## Security
 
-- Open-redirect guarded at the admin login: only strictly-relative paths accepted for `?next=`.
-- Admin auth: signed cookies (HMAC-SHA256), DB-backed session-version revoke, edge HMAC + handler-level full check, login rate limit, and a min-length guard so a typo'd 1-char `ADMIN_PASSWORD` fails closed.
-- Email webhook: Svix signature + 5-minute replay window (per Svix spec) so captured events can't be replayed later.
-- CSV export: auth-gated (401, not redirect), formula-injection-safe (leading-quote guard for `=+-@` etc.), hard-capped at 50k rows so a viral list can't OOM the worker.
-- Honeypot field is `website_url` (not the obvious `company`/`url`) and is wired through React state into the signup body, so bots that auto-fill known honeypot names trip it instead of skipping it.
+- **Admin auth:** signed cookies (HMAC-SHA256, Web Crypto), DB-backed session-version revoke, edge + handler-level checks, login rate limit, and a min-length guard so a too-short `ADMIN_PASSWORD` fails closed.
+- **Open redirect:** the admin login only accepts strictly-relative `?next=` paths.
+- **Webhook:** Svix signature plus a 5-minute replay window so captured events can't be replayed later.
+- **CSV export:** auth-gated (401, not a redirect), hard-capped at 50k rows, and RFC 4180-quoted with a formula-injection guard. Leading `=`, `+`, `-`, `@` are neutralized and embedded CR/LF are quoted, so a crafted field like `=cmd|...` can't execute when the file opens in a spreadsheet.
+- **Honeypot:** the trap field is `website_url` (not the obvious `company`/`url`) and is wired through React state into the signup body, so bots that auto-fill known honeypot names trip it.
 
 Found a vulnerability? See [SECURITY.md](SECURITY.md) for the disclosure email and scope.
-
-## What this is NOT
-
-- **Not a SaaS replacement**. If you need multi-tenant accounts, payment processing, or anything beyond a pre-launch waitlist, build that separately. This is for the validation phase.
-- **Not a hosted product**. You deploy it. There's no "waitlist.cloud" you sign up for. The whole point is you own your data and have no monthly bill until you outgrow the free tier.
-- **Not a no-code tool**. You'll edit a config file and (optionally) tweak the landing. Vibecoder DX is the goal; zero coding is not.
-- **Not opinionated about your design**. The default landing is a Stripe-Press-style "technical paper" look. Swap it for whatever you want via Claude Code or hand-edits. The backend doesn't care.
-- **Not multi-region**. D1 is single-region; reads from other regions go through Cloudflare's network. Fine for a waitlist; not fine for low-latency global reads at scale.
-- **Not a referral fraud system**. Honeypot + per-IP rate limit + disposable email blocklist + self-referral block catch the obvious abuse. Sophisticated fraud (residential proxy farms, real human gig workers) needs more.
 
 ## Stack
 
 - Next.js 15 (App Router) on `@opennextjs/cloudflare`
 - React 19, TypeScript 5.7 strict
 - pnpm 10 + Turborepo workspaces
-- vitest with an in-memory SQLite test harness for D1 (real schema, real queries, fast)
+- D1 (SQLite) with an in-memory SQLite test harness (real schema, real queries)
+- R2 for the optional OG image cache
 - workers-og for OG rendering (Satori + Yoga + Resvg as WASM)
-- Resend for email (Postmark + SendGrid adapter stubs included)
+- Resend for transactional email
 
-## Contributing
+---
 
-PRs welcome. The Postmark and SendGrid email provider stubs are good first issues — both have a `// PRs welcome` comment with the exact API shape. See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+Built on the open-source [waitlist-stack](https://github.com/Giri-Aayush/waitlist-stack) template. Licensed MIT, see [LICENSE](LICENSE).
