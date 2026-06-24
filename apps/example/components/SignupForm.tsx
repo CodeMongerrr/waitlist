@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import type { Theme } from "@/lib/theme";
+import { useId, useRef, useState } from "react";
 import type { Signup } from "@/lib/helpers";
 import { validateEmail } from "@/lib/helpers";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type Props = {
-  t: Theme;
   onSuccess?: (signup: Signup) => void;
-  dense?: boolean;
 };
 
 interface ApiResponse {
@@ -25,9 +25,12 @@ function refFromUrl(): string | undefined {
   return new URLSearchParams(window.location.search).get("ref") ?? undefined;
 }
 
-export function SignupForm({ t, onSuccess }: Props) {
+export function SignupForm({ onSuccess }: Props) {
+  const emailId = useId();
+  const helperId = useId();
+  const errorId = useId();
+
   const [email, setEmail] = useState("");
-  const [handle, setHandle] = useState("");
   // Honeypot. Hidden from humans; bots that auto-fill all inputs trip it.
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [error, setError] = useState("");
@@ -35,7 +38,27 @@ export function SignupForm({ t, onSuccess }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [touched, setTouched] = useState(false);
 
-  const submit = async (e?: React.FormEvent) => {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Validate on blur (not on every keystroke): show the error only once the
+  // user has finished with the field. Skill rule: inline-validation.
+  const validateOnBlur = () => {
+    if (!email) return;
+    setTouched(true);
+    const v = validateEmail(email);
+    if (!v.ok) {
+      setError(v.reason);
+      setSuggestion("");
+    } else if (v.suggestion) {
+      setSuggestion(v.suggestion);
+      setError("");
+    } else {
+      setError("");
+    }
+  };
+
+  const submit = async (e?: React.FormEvent, force = false) => {
     e?.preventDefault();
     setTouched(true);
     setError("");
@@ -43,9 +66,12 @@ export function SignupForm({ t, onSuccess }: Props) {
     const v = validateEmail(email);
     if (!v.ok) {
       setError(v.reason);
+      emailRef.current?.focus();
       return;
     }
-    if (v.suggestion) {
+    // `force` is the "no, send anyway" path: skip the typo suggestion and send
+    // the address as typed (otherwise a real typo-shaped domain can't get past).
+    if (v.suggestion && !force) {
       setSuggestion(v.suggestion);
       return;
     }
@@ -56,7 +82,6 @@ export function SignupForm({ t, onSuccess }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
-          x_handle: handle.trim() || undefined,
           source: "landing",
           ref: refFromUrl(),
           website_url: websiteUrl,
@@ -65,18 +90,33 @@ export function SignupForm({ t, onSuccess }: Props) {
       const body = (await res.json().catch(() => ({}))) as ApiResponse;
       if (!res.ok) {
         setError(body.error ?? "Something went wrong. Try again.");
+        emailRef.current?.focus();
         return;
       }
-      const cleanHandle = handle.trim().replace(/^@+/, "");
-      const display = cleanHandle || email.trim().toLowerCase().split("@")[0] || "you";
+      const display = email.trim().toLowerCase().split("@")[0] || "you";
+      // Capture the card now: onSuccess swaps this form for the taller referral
+      // card in the same .float-card, which can push its Share button below the
+      // fold on mobile. Scroll it into view so the success state stays on screen.
+      const card = formRef.current?.closest<HTMLElement>(".float-card") ?? null;
       onSuccess?.({
         name: display,
         email: email.trim().toLowerCase(),
         code: body.referralCode ?? "",
         position: body.position ?? 1,
+        referralCount: body.referralCount ?? 0,
       });
+      if (card) {
+        // Two frames: let React commit the taller referral card before we
+        // center it, otherwise we'd center the old (shorter) form layout.
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() =>
+            card.scrollIntoView({ behavior: "smooth", block: "center" }),
+          ),
+        );
+      }
     } catch {
       setError("Network error. Check your connection and retry.");
+      emailRef.current?.focus();
     } finally {
       setSubmitting(false);
     }
@@ -87,26 +127,18 @@ export function SignupForm({ t, onSuccess }: Props) {
     setSuggestion("");
   };
 
-  const field: React.CSSProperties = {
-    padding: "13px 14px",
-    fontFamily: t.uiFont,
-    fontSize: 15,
-    color: t.fg,
-    background: t.inputBg,
-    border: `1px solid ${touched && error ? t.danger : t.border}`,
-    borderRadius: t.radius,
-    outline: "none",
-    transition: "border-color .15s, box-shadow .15s",
-    width: "100%",
-    minWidth: 0,
-  };
+  const showError = touched && !!error;
 
   return (
-    <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 8, textAlign: "left" }}>
-      {/* Row 1: email + submit */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <input
-          className="wl-input"
+    <form ref={formRef} onSubmit={submit} className="flex flex-col gap-2 text-left" noValidate>
+      {/* Email (the only field; everything else is asked for after signup). */}
+      <div className="flex flex-col gap-1">
+        <Label htmlFor={emailId} className="sr-only">
+          Email address
+        </Label>
+        <Input
+          ref={emailRef}
+          id={emailId}
           name="email"
           type="email"
           inputMode="email"
@@ -116,72 +148,14 @@ export function SignupForm({ t, onSuccess }: Props) {
           onChange={(e) => {
             setEmail(e.target.value);
             setSuggestion("");
+            if (error) setError("");
           }}
-          style={{ ...field, flex: "1 1 240px" }}
+          onBlur={validateOnBlur}
           disabled={submitting}
+          aria-invalid={showError}
+          aria-describedby={`${helperId}${showError ? ` ${errorId}` : ""}`}
+          className="h-12 text-base md:text-base dark:bg-black/20"
         />
-        <button
-          type="submit"
-          disabled={submitting}
-          style={{
-            flex: "1 1 150px",
-            padding: "13px 18px",
-            background: t.btnBg,
-            color: t.btnFg,
-            border: `1px solid ${t.btnBorder}`,
-            borderRadius: t.radius,
-            cursor: submitting ? "wait" : "pointer",
-            fontFamily: t.uiFont,
-            fontSize: 15,
-            fontWeight: 600,
-            letterSpacing: "0.01em",
-            transition: "filter .15s, transform .08s",
-          }}
-        >
-          {submitting ? "Reserving…" : t.ctaLabel}
-        </button>
-      </div>
-
-      {/* Row 2: optional handle. The "@" is fixed so users type only the name. */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <div
-          className="wl-input"
-          style={{ ...field, flex: "1 1 100%", padding: 0, display: "flex", alignItems: "center" }}
-        >
-          <span
-            style={{
-              padding: "13px 4px 13px 14px",
-              fontFamily: t.uiFont,
-              fontSize: 15,
-              color: t.muted,
-              userSelect: "none",
-            }}
-            aria-hidden="true"
-          >
-            @
-          </span>
-          <input
-            name="x_handle"
-            type="text"
-            autoComplete="off"
-            placeholder="yourhandle (optional)"
-            aria-label="Your X handle"
-            value={handle}
-            onChange={(e) => setHandle(e.target.value.replace(/^@+/, ""))}
-            style={{
-              flex: 1,
-              minWidth: 0,
-              padding: "13px 14px 13px 0",
-              border: "none",
-              outline: "none",
-              background: "transparent",
-              fontFamily: t.uiFont,
-              fontSize: 15,
-              color: t.fg,
-            }}
-            disabled={submitting}
-          />
-        </div>
       </div>
 
       {/* Honeypot */}
@@ -193,60 +167,52 @@ export function SignupForm({ t, onSuccess }: Props) {
         aria-hidden="true"
         value={websiteUrl}
         onChange={(e) => setWebsiteUrl(e.target.value)}
-        style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+        className="absolute left-[-9999px] h-px w-px opacity-0"
       />
 
+      <Button
+        type="submit"
+        disabled={submitting}
+        size="lg"
+        className="mt-1 h-12 w-full text-base font-semibold"
+      >
+        {submitting ? "Reserving…" : "Join the waitlist"}
+      </Button>
+
       {suggestion && (
-        <div style={{ fontSize: 12.5, color: t.muted, fontFamily: t.uiFont, lineHeight: 1.4 }}>
+        <div role="status" aria-live="polite" className="text-[12.5px] leading-snug text-muted-foreground">
           Did you mean{" "}
           <button
             type="button"
             onClick={acceptSuggestion}
-            style={{ background: "none", border: 0, padding: 0, cursor: "pointer", color: t.fg, textDecoration: "underline", font: "inherit" }}
+            className="inline-flex min-h-[24px] cursor-pointer items-center py-1 align-baseline font-[inherit] text-foreground underline"
           >
             {suggestion}
           </button>
           ?{" "}
           <button
             type="button"
-            onClick={() => submit()}
-            style={{ background: "none", border: 0, padding: 0, cursor: "pointer", color: t.muted, textDecoration: "underline", font: "inherit", marginLeft: 6 }}
+            onClick={() => submit(undefined, true)}
+            className="ml-1.5 inline-flex min-h-[24px] cursor-pointer items-center py-1 align-baseline font-[inherit] text-muted-foreground underline"
           >
             no, send anyway
           </button>
         </div>
       )}
 
-      {error && (
-        <div style={{ fontSize: 12.5, color: t.danger, fontFamily: t.uiFont }}>{error}</div>
+      {showError && (
+        <div id={errorId} role="alert" className="text-[12.5px] text-destructive">
+          {error}
+        </div>
       )}
 
-      <div
-        style={{
-          fontFamily: t.monoFont,
-          fontSize: 11.5,
-          letterSpacing: "0.04em",
-          color: t.faint,
-          textAlign: "center",
-          marginTop: 6,
-        }}
+      {/* One-line reassurance + referral hook (fits a single line on mobile). */}
+      <p
+        id={helperId}
+        className="mt-2 text-center font-mono text-[11px] tracking-[0.04em] text-faint"
       >
-        No card. No spam. Just early access.
-      </div>
-
-      {/* Referral loop, surfaced before signup. 5 matches config.referral.jumpsPerReferral. */}
-      <div
-        style={{
-          fontFamily: t.monoFont,
-          fontSize: 11,
-          letterSpacing: "0.04em",
-          color: t.faint,
-          textAlign: "center",
-          marginTop: 4,
-        }}
-      >
-        Every friend who joins with your link moves you up 5 spots.
-      </div>
+        No card. No spam. Refer to skip ahead.
+      </p>
     </form>
   );
 }

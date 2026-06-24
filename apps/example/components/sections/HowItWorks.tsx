@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Theme } from "@/lib/theme";
-import { SectionMark } from "./SectionMark";
+import { Section, SectionHeading } from "./Section";
 
 type Stage = {
   n: string;
@@ -15,64 +14,59 @@ type Stage = {
   demo?: boolean;
 };
 
-export function HowItWorks({ t }: { t: Theme }) {
+// Monochrome rail tones, pulled from CSS tokens. The spine gradient interpolates
+// between adjacent stages, so we hand the raw var() to inline styles.
+const MINT = "var(--rail-1)";
+const CYAN = "var(--rail-2)";
+const PEACH = "var(--rail-3)";
+
+export function HowItWorks() {
   const stages: Stage[] = [
     {
       n: "01",
       tag: "Harvest",
       title: "Reads what you'd read",
-      color: t.accentCyan,
-      next: t.accent,
+      color: CYAN,
+      next: MINT,
       annot: "scans your niche",
-      body: "Catalyst tracks the releases, threads, and arguments in your corner of crypto, AI, and devtools across Reddit, Hacker News, Google News, and X, the same sources you'd open if you had the time. Every draft starts from something real and current.",
+      body: "Pulls from Reddit, Hacker News, and Google News. Drafts start from something real.",
     },
     {
       n: "02",
       tag: "Draft",
       title: (
         <>
-          Writes{" "}
-          <span style={{ fontFamily: t.serifFont, fontStyle: "italic", fontWeight: 400, color: "rgba(244,244,245,0.55)" }}>
-            in your voice
-          </span>
+          Writes <span className="italic font-normal text-foreground/70">in your voice</span>
         </>
       ),
-      color: t.accent,
-      next: t.accentMint,
+      color: MINT,
+      next: MINT,
       annot: "from your past posts",
-      body: "Catalyst drafts from how you actually write: your phrasing, your takes, your restraint. It amplifies your voice. It does not swap it for a generic high-engagement one. This is not an AI tweet generator.",
+      body: "Built from your phrasing and takes, never a generic high-engagement voice.",
     },
     {
       n: "03",
       tag: "Approve",
       title: "You approve, or you don't",
-      color: t.accentMint,
-      next: t.accentPeach,
+      color: MINT,
+      next: PEACH,
       demo: true,
-      body: "Open the dashboard, read the queue, ship what's good, kill what isn't. The decision is always a human one.",
+      body: "Read the queue, ship what's good, kill what isn't.",
     },
     {
       n: "04",
       tag: "Learn",
       title: "Posts on your call, then sharpens",
-      color: t.accentPeach,
+      color: PEACH,
       next: "transparent",
       annot: "ships on schedule",
-      body: "Approved drafts post on schedule. Your edits are the training: what you approve, change, and reject tightens your voice, so the queue needs less from you each week, not more.",
+      body: "Your edits train it, so it needs less from you each week.",
     },
   ];
 
-  const mono: React.CSSProperties = {
-    fontFamily: t.monoFont,
-    fontSize: 11,
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
-  };
-
   // The highlight rides the scroll: whichever stage sits nearest the viewport
-  // center becomes "active" and lights up (glow behind the numeral, enlarged
-  // node, lit title, dimmed siblings). Defaults to 03 so the no-JS render keeps
-  // the demo-anchored stage emphasized.
+  // center becomes "active" and lights up. Defaults to 03 so the no-JS render
+  // keeps the demo-anchored stage emphasized.
   const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(2);
 
@@ -108,207 +102,113 @@ export function HowItWorks({ t }: { t: Theme }) {
   }, []);
 
   return (
-    <section
-      id="how"
-      style={{ maxWidth: 1180, margin: "0 auto", padding: "clamp(72px,10vw,128px) clamp(20px,5vw,72px)" }}
-    >
-      <SectionMark t={t} index="01" label="How it works" aside="Loop" fileTag="· catalyst.loop ·" />
-
-      <h2
-        className="reveal"
-        data-reveal
-        style={{
-          fontFamily: t.displayFont,
-          fontWeight: 700,
-          fontSize: "clamp(28px,5vw,52px)",
-          lineHeight: 1.04,
-          letterSpacing: "-0.025em",
-          margin: "0 0 clamp(24px,4vw,48px)",
-          color: t.fg,
-          textWrap: "balance",
-          maxWidth: 760,
-        }}
-      >
+    <Section id="how">
+      <SectionHeading className="mb-[clamp(24px,4vw,48px)]">
         A loop you can audit, end to end.
-      </h2>
+      </SectionHeading>
 
-      <div style={{ position: "relative" }}>
+      <div className="relative">
         {stages.map((s, i) => {
           const active = i === activeIndex;
           return (
-          <div
-            key={s.n}
-            ref={(el) => {
-              rowRefs.current[i] = el;
-            }}
-            className="audit-row reveal"
-            data-reveal
-            style={{ padding: "clamp(28px,4vw,46px) 0", animationDelay: `${i * 70}ms` }}
-          >
-            {/* col 1: giant numeral (gutter, hidden on mobile) */}
-            <div className="rail-gutter" style={{ position: "relative", textAlign: "right", paddingRight: 4 }}>
-              {/* wide glow that rides the active numeral */}
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  right: -20,
-                  top: "50%",
-                  width: 210,
-                  height: 210,
-                  transform: `translateY(-50%) scale(${active ? 1 : 0.7})`,
-                  background:
-                    "radial-gradient(circle, rgba(255,255,255,0.18), rgba(255,255,255,0.06) 36%, transparent 70%)",
-                  opacity: active ? 1 : 0,
-                  filter: "blur(4px)",
-                  pointerEvents: "none",
-                  transition: "opacity 0.55s ease, transform 0.55s ease",
-                  zIndex: 0,
-                }}
-              />
-              <span
-                className="stroke-num"
-                aria-hidden
-                style={{
-                  position: "relative",
-                  zIndex: 1,
-                  fontFamily: t.displayFont,
-                  fontWeight: 800,
-                  fontSize: "clamp(52px,7vw,100px)",
-                  lineHeight: 0.85,
-                  display: "block",
-                  transformOrigin: "right center",
-                  transform: active ? "scale(1.06)" : "scale(1)",
-                  transition: "transform 0.55s cubic-bezier(0.16,0.84,0.3,1), color 0.4s ease",
-                  ...(active
-                    ? { WebkitTextStroke: `1px ${t.accentMint}`, color: "rgba(255,255,255,0.12)" }
-                    : {}),
-                }}
-              >
-                {s.n}
-              </span>
-            </div>
-
-            {/* col 2: spine segment + node */}
-            <div style={{ position: "relative", alignSelf: "stretch", zIndex: 1 }}>
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  top: 0,
-                  bottom: 0,
-                  width: 2,
-                  overflow: "hidden",
-                  background: `linear-gradient(180deg, ${s.color}, ${s.next})`,
-                  boxShadow: "0 0 12px rgba(255,255,255,0.18)",
-                  opacity: 0.9,
-                }}
-              >
-                <i
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    width: "100%",
-                    height: "32%",
-                    background:
-                      "linear-gradient(180deg, transparent, rgba(255,255,255,0.85), transparent)",
-                    animation: "spineFlow 5s linear infinite",
-                    animationDelay: `${i * 0.6}s`,
-                  }}
-                />
-              </div>
-              {/* node */}
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: 4,
-                  transform: "translateX(-50%)",
-                  width: active ? 22 : 14,
-                  height: active ? 22 : 14,
-                  borderRadius: 99,
-                  border: `1.5px solid ${active ? t.accentMint : s.color}`,
-                  background: "#08090a",
-                  boxShadow: active
-                    ? `0 0 28px ${t.accentMint}, 0 0 60px rgba(255,255,255,0.45)`
-                    : `0 0 16px ${s.color}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition:
-                    "width 0.45s cubic-bezier(0.16,0.84,0.3,1), height 0.45s cubic-bezier(0.16,0.84,0.3,1), box-shadow 0.45s ease, border-color 0.4s ease",
-                  ...(active ? { animation: "dotPulse 2.4s ease-in-out infinite" } : {}),
-                }}
-              >
-                <span
-                  style={{
-                    width: 4,
-                    height: 4,
-                    borderRadius: 99,
-                    background: active ? t.accentMint : s.color,
-                    transition: "background 0.4s ease",
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* col 3: content (dims when this stage is not the active one) */}
             <div
-              style={{
-                position: "relative",
-                zIndex: 1,
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-                opacity: active ? 1 : 0.5,
-                transition: "opacity 0.5s ease",
+              key={s.n}
+              ref={(el) => {
+                rowRefs.current[i] = el;
               }}
+              className="audit-row reveal py-[clamp(24px,4vw,46px)]"
+              style={{ animationDelay: `${i * 70}ms` }}
             >
-              <div style={{ ...mono, color: t.muted, display: "flex", alignItems: "center", gap: 8 }}>
-                <span>{s.n} / {s.tag}</span>
-                {s.annot && <span style={{ color: t.faint, letterSpacing: "0.06em" }}>· {s.annot}</span>}
+              {/* col 1: giant numeral (gutter, hidden on mobile) */}
+              <div className="rail-gutter relative pr-1 text-right">
+                <span
+                  className="stroke-num relative z-[1] block origin-[right_center] text-[clamp(52px,7vw,100px)] font-extrabold leading-[0.85] transition-[transform,color] duration-500"
+                  aria-hidden
+                  style={{
+                    transform: active ? "scale(1.06)" : "scale(1)",
+                    ...(active
+                      ? { WebkitTextStroke: `1px ${MINT}`, color: "rgba(255,255,255,0.12)" }
+                      : {}),
+                  }}
+                >
+                  {s.n}
+                </span>
               </div>
+
+              {/* col 2: spine segment + node */}
+              <div className="relative z-[1] self-stretch">
+                <div
+                  aria-hidden
+                  className="absolute left-1/2 top-0 bottom-0 w-0.5 -translate-x-1/2 overflow-hidden opacity-90 shadow-[0_0_12px_rgba(255,255,255,0.18)]"
+                  style={{ background: `linear-gradient(180deg, ${s.color}, ${s.next})` }}
+                >
+                  <i
+                    className="absolute left-0 h-[32%] w-full animate-[spineFlow_5s_linear_infinite] bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.85),transparent)]"
+                    style={{ animationDelay: `${i * 0.6}s` }}
+                  />
+                </div>
+                {/* node */}
+                <div
+                  aria-hidden
+                  className="absolute left-1/2 top-1 flex -translate-x-1/2 items-center justify-center rounded-full bg-surface-sink transition-[width,height,box-shadow,border-color] duration-[450ms]"
+                  style={{
+                    width: active ? 22 : 14,
+                    height: active ? 22 : 14,
+                    border: `1.5px solid ${active ? MINT : s.color}`,
+                    boxShadow: active
+                      ? `0 0 28px ${MINT}, 0 0 60px rgba(255,255,255,0.45)`
+                      : `0 0 16px ${s.color}`,
+                    ...(active ? { animation: "dotPulse 2.4s ease-in-out infinite" } : {}),
+                  }}
+                >
+                  <span
+                    className="size-1 rounded-full transition-colors"
+                    style={{ background: active ? MINT : s.color }}
+                  />
+                </div>
+              </div>
+
+              {/* col 3: content (dims when this stage is not the active one) */}
               <div
-                style={{
-                  fontFamily: t.displayFont,
-                  fontSize: "clamp(20px,2.6vw,27px)",
-                  fontWeight: 600,
-                  letterSpacing: "-0.015em",
-                  color: t.fg,
-                  lineHeight: 1.12,
-                  paddingLeft: active ? 12 : 0,
-                  borderLeft: `2px solid ${active ? t.accentMint : "transparent"}`,
-                  transition: "padding-left 0.45s cubic-bezier(0.16,0.84,0.3,1), border-color 0.4s ease",
-                }}
+                className="relative z-[1] flex flex-col gap-2 transition-opacity duration-500"
+                style={{ opacity: active ? 1 : 0.72 }}
               >
-                {s.title}
+                <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                  <span>
+                    {s.n} / {s.tag}
+                  </span>
+                  {s.annot && (
+                    <span className="tracking-[0.06em] text-faint">· {s.annot}</span>
+                  )}
+                </div>
+                <div
+                  className="text-[clamp(20px,2.6vw,27px)] font-semibold leading-[1.12] tracking-[-0.015em] text-foreground transition-[padding-left,border-color] duration-[450ms]"
+                  style={{
+                    paddingLeft: active ? 12 : 0,
+                    borderLeft: `2px solid ${active ? MINT : "transparent"}`,
+                  }}
+                >
+                  {s.title}
+                </div>
+                <div className="max-w-[52ch] text-sm leading-relaxed text-muted-foreground">
+                  {s.body}
+                </div>
+                {s.demo && (
+                  <>
+                    <div className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-foreground">
+                      Your call, every time · ~10 min/day
+                    </div>
+                    <div className="mt-3 max-w-[340px]">
+                      <MiniDraft />
+                    </div>
+                  </>
+                )}
               </div>
-              <div style={{ fontFamily: t.uiFont, fontSize: 14, lineHeight: 1.6, color: t.muted, maxWidth: "52ch" }}>
-                {s.body}
-              </div>
-              {s.demo && (
-                <>
-                  <div style={{ ...mono, fontSize: 10.5, color: t.accentMint, marginTop: 2 }}>
-                    You approve every post · ~10 min/day
-                  </div>
-                  <div style={{ maxWidth: 340, marginTop: 12 }}>
-                    <MiniDraft t={t} />
-                  </div>
-                </>
-              )}
             </div>
-          </div>
           );
         })}
       </div>
-
-      <div style={{ ...mono, fontSize: 11, color: t.faint, marginTop: 28, textAlign: "center" }}>
-        ↺ The loop only moves when you say go
-      </div>
-    </section>
+    </Section>
   );
 }
 
@@ -321,94 +221,50 @@ const DRAFTS = [
 
 type Flash = null | "approved" | "rejected";
 
-function MiniDraft({ t }: { t: Theme }) {
+function MiniDraft() {
   const [index, setIndex] = useState(0);
-  const [text, setText] = useState(DRAFTS[0]);
   const [flash, setFlash] = useState<Flash>(null);
   const [approved, setApproved] = useState(0);
   const [busy, setBusy] = useState(false);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(advanceTimer.current), []);
+
+  // The shown draft is derived from `index`; no separate text state to keep in sync.
+  const text = DRAFTS[index];
 
   const advance = (action: Exclude<Flash, null>) => {
     if (busy) return;
     setBusy(true);
     setFlash(action);
     if (action !== "rejected") setApproved((n) => n + 1);
-    setTimeout(() => {
-      const ni = (index + 1) % DRAFTS.length;
-      setIndex(ni);
-      setText(DRAFTS[ni]);
+    advanceTimer.current = setTimeout(() => {
+      setIndex((prev) => (prev + 1) % DRAFTS.length);
       setFlash(null);
       setBusy(false);
     }, 820);
   };
 
-  const btn = (color: string, solid?: boolean): React.CSSProperties => ({
-    flex: 1,
-    fontFamily: t.monoFont,
-    fontSize: 10.5,
-    letterSpacing: "0.06em",
-    textTransform: "uppercase",
-    padding: "8px 4px",
-    borderRadius: 7,
-    border: `1px solid ${solid ? color : t.border}`,
-    background: solid ? color : "transparent",
-    color: solid ? "#04130d" : t.muted,
-    textAlign: "center",
-  });
-
   const flashLabel = flash === "rejected" ? "Rejected" : "Approved · queued";
-  const flashColor = flash === "rejected" ? t.muted : t.accentMint;
 
   return (
-    <div
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        borderRadius: 12,
-        border: `1px solid ${t.border}`,
-        background: "rgba(0,0,0,0.28)",
-        padding: 12,
-      }}
-    >
+    <div className="relative overflow-hidden rounded-xl border border-border bg-black/30 p-3">
       {flash && (
         <div
-          className="md-flash"
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 2,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "rgba(8,9,10,0.74)",
-            backdropFilter: "blur(2px)",
-            WebkitBackdropFilter: "blur(2px)",
-          }}
+          role="status"
+          className="md-flash absolute inset-0 z-[2] flex items-center justify-center bg-surface-sink/[0.74] backdrop-blur-[2px]"
         >
           <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              fontFamily: t.monoFont,
-              fontSize: 11,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: flashColor,
-            }}
+            className={`inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.08em] ${
+              flash === "rejected" ? "text-muted-foreground" : "text-foreground"
+            }`}
           >
             <span
-              style={{
-                width: 18,
-                height: 18,
-                borderRadius: 99,
-                border: `1.5px solid ${flashColor}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 11,
-                boxShadow: flash === "rejected" ? "none" : `0 0 14px ${t.accentMint}`,
-              }}
+              aria-hidden="true"
+              className={`flex size-[18px] items-center justify-center rounded-full border text-[11px] ${
+                flash === "rejected"
+                  ? "border-muted-foreground"
+                  : "border-foreground shadow-[0_0_14px_#ffffff]"
+              }`}
             >
               {flash === "rejected" ? "×" : "✓"}
             </span>
@@ -418,30 +274,38 @@ function MiniDraft({ t }: { t: Theme }) {
       )}
 
       <div key={index} className="md-enter">
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <span style={{ width: 22, height: 22, borderRadius: 99, background: "linear-gradient(135deg,#3a3a3c,#6e6e74)" }} />
-          <span style={{ fontFamily: t.uiFont, fontSize: 12, fontWeight: 600, color: t.fg }}>You</span>
-          <span style={{ fontFamily: t.monoFont, fontSize: 11, color: t.faint }}>@yourhandle</span>
-          <span style={{ marginLeft: "auto", fontFamily: t.monoFont, fontSize: 10.5, color: t.faint }}>
+        <div className="mb-2 flex items-center gap-2">
+          <span className="size-[22px] rounded-full bg-[linear-gradient(135deg,#3a3a3c,#6e6e74)]" />
+          <span className="text-xs font-semibold text-foreground">You</span>
+          <span className="font-mono text-[11px] text-faint">@yourhandle</span>
+          <span className="ml-auto font-mono text-[10.5px] text-faint">
             {index + 1}/{DRAFTS.length}
           </span>
         </div>
 
-        <div style={{ fontFamily: t.uiFont, fontSize: 12.5, lineHeight: 1.5, color: t.fg, marginBottom: 10, minHeight: 54 }}>
+        <div className="mb-2.5 min-h-[54px] text-[12.5px] leading-normal text-foreground">
           {text}
         </div>
 
-        <div style={{ display: "flex", gap: 6 }}>
-          <button type="button" className="md-btn" style={btn(t.accentMint, true)} onClick={() => advance("approved")}>
+        <div className="flex gap-1.5">
+          <button
+            type="button"
+            className="md-btn flex min-h-[44px] flex-1 items-center justify-center rounded-md border border-foreground bg-foreground px-2 py-3 text-center font-mono text-[10.5px] uppercase tracking-[0.06em] text-background sm:min-h-0 sm:py-2"
+            onClick={() => advance("approved")}
+          >
             Approve
           </button>
-          <button type="button" className="md-btn" style={btn(t.fg)} onClick={() => advance("rejected")}>
+          <button
+            type="button"
+            className="md-btn flex min-h-[44px] flex-1 items-center justify-center rounded-md border border-border bg-transparent px-2 py-3 text-center font-mono text-[10.5px] uppercase tracking-[0.06em] text-muted-foreground sm:min-h-0 sm:py-2"
+            onClick={() => advance("rejected")}
+          >
             Reject
           </button>
         </div>
       </div>
 
-      <div style={{ fontFamily: t.monoFont, fontSize: 10, letterSpacing: "0.06em", color: t.faint, marginTop: 9 }}>
+      <div role="status" className="mt-2.5 font-mono text-[10px] tracking-[0.06em] text-faint">
         {approved > 0 ? `${approved} approved here · go on, it's a demo` : "Try it · approve or reject"}
       </div>
     </div>

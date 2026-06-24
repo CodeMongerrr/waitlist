@@ -1,92 +1,61 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { THEME } from "@/lib/theme";
 import type { Signup } from "@/lib/helpers";
 import { useReferralPosition } from "@/lib/use-referral-position";
+import { Toaster } from "@/components/ui/sonner";
 import { Header } from "./sections/Header";
 import { Hero } from "./sections/Hero";
 import { HowItWorks } from "./sections/HowItWorks";
 import { TrustStrip } from "./sections/TrustStrip";
+import { Marquee } from "./sections/Marquee";
 import { Faq } from "./sections/Faq";
 import { Cta } from "./sections/Cta";
 import { Footer } from "./sections/Footer";
 
-const t = THEME;
-
-// "Iridescent Spec Room" single-scroll landing. One signup state is shared
-// between the hero form and the final CTA, so submitting either flips both to
-// the referral success card. useReferralPosition keeps the queue position live.
+// Single-scroll landing rendered as one client island. The hero form and the
+// final CTA share one signup so submitting either flips both to the referral
+// card; useReferralPosition keeps the queue position and referral count live.
+//
+// Note on architecture: an RSC split (server page + per-section client islands)
+// was measured and *increased* First Load JS by ~64 kB here, because the static
+// sections are small while the interactive islands dominate, so fragmenting the
+// client module graph cost more than the static sections saved. One cohesive
+// client island chunks more efficiently for this page shape.
 export function CatalystLanding() {
   const [signup, setSignup] = useState<Signup | null>(null);
 
-  const onLivePosition = useCallback((next: { position: number }) => {
-    setSignup((prev) => (prev ? { ...prev, position: next.position } : prev));
-  }, []);
+  const onLivePosition = useCallback(
+    (next: { position: number; referralCount: number; jumpsPerReferral: number }) => {
+      setSignup((prev) =>
+        prev
+          ? {
+              ...prev,
+              position: next.position,
+              referralCount: next.referralCount,
+              jumpsPerReferral: next.jumpsPerReferral,
+            }
+          : prev,
+      );
+    },
+    [],
+  );
   useReferralPosition(signup?.code, onLivePosition);
 
   return (
-    <div style={{ background: t.bg, color: t.fg, minHeight: "100vh" }}>
+    <div className="min-h-screen bg-background text-foreground">
       <div className="grain" aria-hidden />
-      <Header t={t} />
+      <Header />
       <main>
-        <Hero t={t} signup={signup} setSignup={setSignup} />
-        <HowItWorks t={t} />
-        <TrustStrip t={t} />
-        <Marquee t={t} />
-        <Faq t={t} />
-        <Cta t={t} signup={signup} setSignup={setSignup} />
+        <Hero signup={signup} setSignup={setSignup} />
+        <HowItWorks />
+        <TrustStrip />
+        <Marquee />
+        <Faq />
+        <Cta signup={signup} setSignup={setSignup} />
       </main>
-      <Footer t={t} />
-    </div>
-  );
-}
-
-function Marquee({ t }: { t: typeof THEME }) {
-  const items = [
-    "Sounds like you, not a bot",
-    "You approve every post",
-    "No auto-post, ever",
-    "Built for X, done right",
-    "Researched from Reddit, HN, and Google News",
-    "A loop you can audit",
-    "Your voice, amplified",
-  ];
-  const Strip = () => (
-    <span style={{ display: "inline-flex", alignItems: "center" }}>
-      {items.map((x, i) => (
-        <span key={i} style={{ display: "inline-flex", alignItems: "center" }}>
-          <span
-            style={{
-              padding: "0 22px",
-              fontFamily: t.monoFont,
-              fontSize: 12,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: t.muted,
-            }}
-          >
-            {x}
-          </span>
-          <span style={{ color: t.accent }}>◆</span>
-        </span>
-      ))}
-    </span>
-  );
-  return (
-    <div
-      className="marquee"
-      style={{
-        borderTop: `1px solid ${t.border}`,
-        borderBottom: `1px solid ${t.border}`,
-        padding: "16px 0",
-        background: "rgba(255,255,255,0.015)",
-      }}
-    >
-      <div className="marquee-track">
-        <Strip />
-        <Strip />
-      </div>
+      <Footer />
+      <Toaster position="bottom-center" />
     </div>
   );
 }

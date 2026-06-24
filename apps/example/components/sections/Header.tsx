@@ -1,76 +1,34 @@
-import type { Theme } from "@/lib/theme";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-export function Header({ t }: { t: Theme }) {
+export function Header() {
   return (
-    <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        background: "rgba(10,10,10,0.6)",
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
-      }}
-    >
-      <div
-        className="reveal"
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          height: 68,
-          padding: "0 clamp(20px,5vw,48px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-        }}
-      >
+    <header className="sticky top-0 z-[100] bg-background/60 backdrop-blur-md">
+      <div className="reveal mx-auto flex h-[68px] max-w-[1180px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-[72px]">
         <a
           href="#top"
-          style={{ display: "flex", alignItems: "center", gap: 11, textDecoration: "none" }}
+          className="flex items-center gap-[11px] rounded-md no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 8,
-              background: t.fg,
-              color: t.bg,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: t.displayFont,
-              fontWeight: 800,
-              fontSize: 17,
-              lineHeight: 1,
-            }}
-          >
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-foreground text-[17px] font-extrabold leading-none text-background">
             c
           </span>
-          <span
-            style={{
-              fontFamily: t.displayFont,
-              fontWeight: 600,
-              fontSize: 18,
-              letterSpacing: "-0.01em",
-              color: t.fg,
-            }}
-          >
+          <span className="text-lg font-semibold tracking-[-0.01em] text-foreground">
             Catalyst
           </span>
         </a>
 
-        <span
-          style={{
-            fontFamily: t.monoFont,
-            fontSize: 11,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            color: t.faint,
-          }}
-        >
-          Private beta
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="hide-sm font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
+            Private beta
+          </span>
+          <Button
+            asChild
+            size="sm"
+            className="h-10 min-h-[44px] rounded-full px-4 font-medium sm:h-9 sm:min-h-0"
+          >
+            <Link href="#join">Join the waitlist</Link>
+          </Button>
+        </div>
       </div>
     </header>
   );

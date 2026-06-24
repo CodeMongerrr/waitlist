@@ -1,21 +1,16 @@
 "use client";
 
-import type { Theme } from "@/lib/theme";
 import type { Signup } from "@/lib/helpers";
 import { SignupForm } from "./SignupForm";
 import { ReferralCard } from "./ReferralCard";
 
-// Wraps the signup flow in a 3D-floating glass box. Email is required; the X
-// handle stays optional inside SignupForm. After success the
-// ReferralCard replaces the form in the same floating box, so the card never
-// jumps. Styling lives in globals.css (.float-scene / .float-bob / .float-card)
-// and uses only existing monochrome tokens.
+// Wraps the signup flow in a 3D-floating glass box (email-only). After success
+// the ReferralCard replaces the form in the same floating box, so the card never
+// jumps. Styling lives in globals.css (.float-scene / .float-bob / .float-card).
 export function FloatingSignup({
-  t,
   signup,
   setSignup,
 }: {
-  t: Theme;
   signup: Signup | null;
   setSignup: (s: Signup | null) => void;
 }) {
@@ -25,11 +20,18 @@ export function FloatingSignup({
         <div className="float-card">
           {!signup ? (
             <>
-              <div className="float-eyebrow">Join the waitlist</div>
-              <SignupForm t={t} onSuccess={setSignup} />
+              <div className="mb-4 text-left">
+                <div className="text-[17px] font-semibold tracking-[-0.01em] text-foreground">
+                  Get early access
+                </div>
+                <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+                  Join the Catalyst private beta and claim your spot in the queue.
+                </p>
+              </div>
+              <SignupForm onSuccess={setSignup} />
             </>
           ) : (
-            <ReferralCard t={t} signup={signup} onDone={() => setSignup(null)} />
+            <ReferralCard signup={signup} onDone={() => setSignup(null)} />
           )}
         </div>
       </div>

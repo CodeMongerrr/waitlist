@@ -3,6 +3,11 @@ export type Signup = {
   email: string;
   code: string;
   position: number;
+  // Referral progress, surfaced in the post-signup card. Optional because the
+  // initial signup response may not carry them; useReferralPosition fills them
+  // in on the first live poll.
+  referralCount?: number;
+  jumpsPerReferral?: number;
 };
 
 export type SeedSignup = {

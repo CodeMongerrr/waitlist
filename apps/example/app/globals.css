@@ -1,37 +1,151 @@
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: #0a0a0a;
-  color: #f4f4f5;
-  font-family: var(--font-inter), Inter, system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ----------------------------------------------------------------------------
+   Catalyst design tokens. Monochrome dark direction: near-black canvas, white
+   type, neutral support, white primary action. The only chromatic token is
+   `--live` (the green status / approval signal). The app renders dark-only, so
+   :root and .dark carry the same values; the .dark class on <html> keeps any
+   `dark:` utilities active. muted-foreground is tuned to clear WCAG AA (>=4.5:1)
+   on the near-black background.
+---------------------------------------------------------------------------- */
+:root {
+  --radius: 0.625rem;
+
+  --background: #0a0a0a;
+  --foreground: #f4f4f5;
+
+  --card: #101012;
+  --card-foreground: #f4f4f5;
+  --popover: #141416;
+  --popover-foreground: #f4f4f5;
+
+  --primary: #fafafa;
+  --primary-foreground: #0a0a0a;
+  --secondary: #1b1b1f;
+  --secondary-foreground: #f4f4f5;
+
+  --muted: #1a1a1d;
+  --muted-foreground: #a1a1aa;
+
+  --accent: #202024;
+  --accent-foreground: #fafafa;
+
+  --destructive: #f87171;
+  --destructive-foreground: #0a0a0a;
+
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  --input: rgba(255, 255, 255, 0.38);
+  --ring: rgba(255, 255, 255, 0.55);
+
+  /* Catalyst extensions */
+  --live: #34d399;
+  --faint: #8b8b93;
+  /* rail tones (How it works spine/nodes) + surface shades, named so they stop
+     being copy-pasted hex literals across components */
+  --rail-1: #ffffff;
+  --rail-2: #9a9aa0;
+  --rail-3: #6e6e74;
+  --surface-sink: #08090a;
+  --surface-footer: #161616;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+.dark {
+  --background: #0a0a0a;
+  --foreground: #f4f4f5;
+  --card: #101012;
+  --card-foreground: #f4f4f5;
+  --popover: #141416;
+  --popover-foreground: #f4f4f5;
+  --primary: #fafafa;
+  --primary-foreground: #0a0a0a;
+  --secondary: #1b1b1f;
+  --secondary-foreground: #f4f4f5;
+  --muted: #1a1a1d;
+  --muted-foreground: #a1a1aa;
+  --accent: #202024;
+  --accent-foreground: #fafafa;
+  --destructive: #f87171;
+  --destructive-foreground: #0a0a0a;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  --input: rgba(255, 255, 255, 0.38);
+  --ring: rgba(255, 255, 255, 0.55);
+  --live: #34d399;
+  --faint: #8b8b93;
+  --rail-1: #ffffff;
+  --rail-2: #9a9aa0;
+  --rail-3: #6e6e74;
+  --surface-sink: #08090a;
+  --surface-footer: #161616;
 }
 
-html {
-  scroll-behavior: smooth;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-live: var(--live);
+  --color-faint: var(--faint);
+  --color-rail-1: var(--rail-1);
+  --color-rail-2: var(--rail-2);
+  --color-rail-3: var(--rail-3);
+  --color-surface-sink: var(--surface-sink);
+  --color-surface-footer: var(--surface-footer);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-inter), Inter, system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
 }
 
-a {
-  color: inherit;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-inter), Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+  }
 }
 
-button {
-  font-family: inherit;
-}
-
-::selection {
-  background: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
-}
+/* ============================================================================
+   Bespoke effects. These flourishes (film grain, blueprint grid, 3D float card,
+   marquee, audit-rail spine) carry the brand and have no shadcn equivalent, so
+   they stay as hand-authored CSS layered on top of the token system.
+============================================================================ */
 
 /* ---------- keyframes ---------- */
 @keyframes wlFadeIn {
@@ -80,12 +194,63 @@ button {
   color: rgba(244, 244, 245, 0.42);
 }
 
+/* ---------- shared 1px section divider (fades in/out at the edges) ---------- */
+.hairline {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.16) 22%,
+    rgba(255, 255, 255, 0.16) 78%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
 /* ---------- subtle panel ---------- */
 .glass {
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+/* ---------- shared section primitives ----------
+   One source of truth for the content-section shell and heading that used to be
+   copy-pasted across HowItWorks/TrustStrip/Faq. Plain classes (not @utility) so
+   they don't fight Tailwind's cascade layers; section-h2 sets no margin so a
+   `mb-*` utility still wins. Gutters match the bespoke sections' px-5/sm:px-8/
+   lg:px-[72px] so every section's content edges line up. */
+.section-shell {
+  margin-inline: auto;
+  max-width: 1180px;
+  padding-inline: 1.25rem;
+  padding-block: clamp(72px, 10vw, 128px);
+}
+@media (min-width: 640px) {
+  .section-shell { padding-inline: 2rem; }
+}
+@media (min-width: 1024px) {
+  .section-shell { padding-inline: 4.5rem; }
+}
+.section-h2 {
+  max-width: 760px;
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  color: var(--foreground);
+}
+
+/* 6px live/status dot; color (fill + glow) follows the element's text color, so
+   set it with a text-* class (text-live / text-rail-2) or inline color. */
+.status-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentColor;
+  box-shadow: 0 0 9px currentColor;
 }
 
 /* ---------- blueprint grid (hero) ---------- */
@@ -158,6 +323,10 @@ button {
 }
 .md-btn:active {
   transform: translateY(0) scale(0.96);
+}
+.md-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
 }
 .md-edit {
   outline: none;
@@ -232,29 +401,15 @@ button {
   width: 6px;
   height: 6px;
   border-radius: 99px;
-  background: #34d399;
-  box-shadow: 0 0 8px #34d399;
+  background: var(--live);
+  box-shadow: 0 0 8px var(--live);
 }
 @keyframes floatBob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
 
-/* ---------- form controls ---------- */
-.wl-input:focus,
-.wl-input:focus-within {
-  border-color: rgba(255, 255, 255, 0.55) !important;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-}
-
-/* hide secondary nav on small screens */
-@media (max-width: 760px) {
-  .hide-sm {
-    display: none !important;
-  }
-}
-
-/* audit-rail (how it works): grid via class so media queries can collapse it */
+/* ---------- audit-rail (how it works): grid via class so media queries can collapse it ---------- */
 .audit-row {
   display: grid;
   grid-template-columns: clamp(72px, 9vw, 116px) 28px 1fr;
@@ -271,7 +426,7 @@ button {
   }
 }
 
-/* trust manifesto: clause grid that collapses to one column */
+/* ---------- trust manifesto: clause grid that collapses to one column ---------- */
 .clause {
   display: grid;
   grid-template-columns: minmax(140px, 220px) 1fr;
@@ -282,6 +437,37 @@ button {
   .clause {
     grid-template-columns: 1fr;
     row-gap: 12px;
+  }
+}
+
+/* hide secondary nav on small screens */
+@media (max-width: 760px) {
+  .hide-sm {
+    display: none !important;
+  }
+}
+
+/* On phones, flatten the 3D tilt and stop the bob so the signup card sits still
+   and upright (the global reduced-motion guard only covers users who ask for it). */
+@media (max-width: 640px) {
+  .float-card {
+    transform: none;
+    padding: clamp(18px, 5vw, 24px);
+  }
+  .float-bob {
+    animation: none;
+  }
+  .float-card::after {
+    display: none;
+  }
+}
+
+/* The hero gradient word relies on background-clip:text; keep it legible in
+   Windows High Contrast where clipped text can disappear. */
+@media (forced-colors: active) {
+  .hero-gradient-word {
+    forced-color-adjust: none;
+    color: CanvasText;
   }
 }
 

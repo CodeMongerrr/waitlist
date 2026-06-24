@@ -32,7 +32,15 @@ export const metadata: Metadata = {
     title: `${config.brand.name} · ${config.brand.tagline}`,
     description: config.brand.description,
     url: config.brand.siteUrl,
-    images: [{ url: "/api/og" }],
+    images: [
+      {
+        url: "/api/og",
+        width: 1200,
+        height: 630,
+        type: "image/png",
+        alt: `${config.brand.name} · ${config.brand.tagline}`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -55,7 +63,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const jsonLd = buildAllJsonLd(config);
   return (
-    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable}`}>
+    <html lang="en" className={`dark ${inter.variable} ${ibmPlexMono.variable}`}>
       <head>
         {jsonLd.map((block, i) => (
           <script

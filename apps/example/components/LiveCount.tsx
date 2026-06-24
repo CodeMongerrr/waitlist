@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Theme } from "@/lib/theme";
+import { cn } from "@/lib/utils";
 
 // Live social proof: the real waitlist count, fetched on load. Below the reveal
 // threshold the number is too small to persuade, so we show a qualitative line
@@ -10,14 +10,20 @@ import type { Theme } from "@/lib/theme";
 // reduced-motion guard (the global CSS guard only covers CSS animations, not a
 // JS-driven counter).
 const REVEAL_THRESHOLD = 50;
-const LOW_COUNT_LABEL = "Be one of the first founders in line";
+const LOW_COUNT_LABEL = "Be one of the first in line";
 
 export function LiveCount({
-  t,
   align = "center",
+  label,
+  announce = true,
 }: {
-  t: Theme;
   align?: "center" | "start";
+  // Optional lead-in (e.g. "Private beta"), folded into the same line + dot so
+  // the hero shows ONE status row instead of a separate badge stacked above.
+  label?: string;
+  // The same count renders in the hero and the CTA; only one should own the
+  // screen-reader live region so the number isn't announced twice.
+  announce?: boolean;
 }) {
   const [count, setCount] = useState<number | null>(null);
   const [display, setDisplay] = useState(0);
@@ -58,36 +64,50 @@ export function LiveCount({
   }, [count]);
 
   const showNumber = count !== null && count >= REVEAL_THRESHOLD;
-  const label = showNumber
-    ? `${display.toLocaleString()} founders already in line`
+  // Visible "proof" segment. With a label (the hero), keep the row compact and
+  // centered: the label alone carries it until there's a real number worth
+  // showing. Without a label (the CTA, which has more room), show the scarcity
+  // line as the fallback.
+  const proof = showNumber
+    ? `${display.toLocaleString()} in line`
+    : label
+      ? null
+      : LOW_COUNT_LABEL;
+  // Screen readers always hear the full status once (and not every interpolated
+  // count-up frame), even when the visible row is trimmed to just the label.
+  const announcedProof = showNumber
+    ? `${count.toLocaleString()} already in line`
     : LOW_COUNT_LABEL;
+  const announced =
+    count === null ? "" : label ? `${label}. ${announcedProof}` : announcedProof;
 
   return (
     <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: align === "center" ? "center" : "flex-start",
-        gap: 8,
-        fontFamily: t.monoFont,
-        fontSize: 11.5,
-        letterSpacing: "0.06em",
-        color: t.faint,
-      }}
+      className={cn(
+        "inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 font-mono text-[11px] tracking-[0.08em]",
+        align === "start" && "justify-start",
+      )}
     >
       <span
         aria-hidden
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: 99,
-          background: t.live,
-          boxShadow: `0 0 9px ${t.live}`,
-          flex: "none",
-          animation: "dotPulse 2.4s ease-in-out infinite",
-        }}
+        className="status-dot animate-[dotPulse_2.4s_ease-in-out_infinite] text-live"
       />
-      <span aria-live="polite">{label}</span>
+      {label && (
+        <span aria-hidden className="uppercase tracking-[0.16em] text-faint">
+          {label}
+        </span>
+      )}
+      {proof && (
+        <span aria-hidden className="text-muted-foreground">
+          {label && <span className="text-muted-foreground/40">· </span>}
+          {proof}
+        </span>
+      )}
+      {announce && (
+        <span className="sr-only" aria-live="polite">
+          {announced}
+        </span>
+      )}
     </div>
   );
 }
